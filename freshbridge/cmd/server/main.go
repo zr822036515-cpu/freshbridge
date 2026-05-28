@@ -26,6 +26,9 @@ func main() {
 	userRepo := repository.NewUserRepo(db)
 	productRepo := repository.NewProductRepo(db)
 	tradeRepo := repository.NewTradeRepo(db)
+	settlementRepo := repository.NewSettlementRepo(db)
+	logisticsRepo := repository.NewLogisticsRepo(db)
+	marketPriceRepo := repository.NewMarketPriceRepo(db)
 
 	// Init services
 	authSvc := service.NewAuthService(cfg, userRepo)
@@ -35,6 +38,9 @@ func main() {
 	authH := handler.NewAuthHandler(authSvc)
 	productH := handler.NewProductHandler(productSvc)
 	tradeH := handler.NewTradeHandler(tradeRepo)
+	settlementH := handler.NewSettlementHandler(settlementRepo)
+	logisticsH := handler.NewLogisticsHandler(logisticsRepo)
+	marketH := handler.NewMarketHandler(marketPriceRepo)
 
 	r := gin.Default()
 	r.Use(middleware.CORS())
@@ -57,12 +63,23 @@ func main() {
 		auth.GET("/products", productH.Search)
 		auth.GET("/products/my", productH.ListMy)
 		auth.GET("/products/:id", productH.GetByID)
-			auth.POST("/trades", tradeH.Create)
-			auth.PUT("/trades/:id/accept", tradeH.Accept)
-			auth.GET("/trades/my", tradeH.ListMy)
-			auth.GET("/trades/:id/sales", tradeH.GetSales)
-			auth.POST("/sales", tradeH.RecordSale)
+		auth.POST("/trades", tradeH.Create)
+		auth.PUT("/trades/:id/accept", tradeH.Accept)
+		auth.GET("/trades/my", tradeH.ListMy)
+		auth.GET("/trades/:id/sales", tradeH.GetSales)
+		auth.POST("/sales", tradeH.RecordSale)
+		auth.GET("/settlements", settlementH.ListMy)
+		auth.GET("/settlements/:tradeId", settlementH.GetByTrade)
+		auth.POST("/logistics", logisticsH.Create)
+		auth.GET("/logistics/available", logisticsH.ListAvailable)
+		auth.GET("/logistics/my", logisticsH.ListMy)
+		auth.PUT("/logistics/:id/accept", logisticsH.Accept)
+		auth.PUT("/logistics/:id/gps", logisticsH.UpdateGPS)
 	}
+
+	// Market data (no auth required)
+	r.GET("/api/market/prices", marketH.GetLatest)
+	r.GET("/api/market/prices/date", marketH.GetByDate)
 
 	r.Run(":" + cfg.Port)
 }
