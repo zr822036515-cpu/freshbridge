@@ -2,12 +2,11 @@
 set -euo pipefail
 
 # 鲜桥 FreshBridge 一键部署脚本
-# Usage: bash deploy.sh [--init-db] [--backend-only] [--frontend-only]
+# Usage: bash deploy.sh [--init-db]
 
 DEPLOY_ROOT="/opt/freshbridge"
 BACKEND_DIR="${DEPLOY_ROOT}/backend"
-WEB_DIR="${DEPLOY_ROOT}/web"
-NGINX_CONF="/etc/nginx/sites-enabled/freshbridge.conf"
+ENV_FILE="${DEPLOY_ROOT}/backend/.env"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -17,11 +16,7 @@ log() { echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $1"; }
 err() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
 INIT_DB=false
-BACKEND_ONLY=false
-FRONTEND_ONLY=false
 [[ "${1:-}" == "--init-db" ]] && INIT_DB=true
-[[ "${1:-}" == "--backend-only" ]] && BACKEND_ONLY=true
-[[ "${1:-}" == "--frontend-only" ]] && FRONTEND_ONLY=true
 
 # --- Init DB (first deploy only) ---
 if $INIT_DB; then
@@ -32,44 +27,39 @@ if $INIT_DB; then
     log "Database initialized with seed data"
 fi
 
-# --- Backend ---
-if ! $FRONTEND_ONLY; then
-    log "Building backend..."
-    cd "$(dirname "$0")/.."
-    go build -ldflags="-s -w" -o "${BACKEND_DIR}/server" ./cmd/server || err "Backend build failed"
+# --- Build frontend ---
+log "Building frontend..."
+cd "$(dirname "$0")/.."
+(cd miniprogram && npm install --silent && npm run build:h5) || err "Frontend build failed"
 
+# --- Copy frontend to embed directory ---
+log "Embedding frontend..."
+rm -rf internal/static/web
+mkdir -p internal/static/web
+cp -r miniprogram/dist/build/h5/* internal/static/web/
+
+# --- Build single binary (API + frontend) ---
+log "Building server..."
+go build -ldflags="-s -w" -o "${BACKEND_DIR}/server" ./cmd/server || err "Build failed"
+
+# --- Setup env if missing ---
+if [ ! -f "${ENV_FILE}" ]; then
     mkdir -p "${BACKEND_DIR}"
-    cp cmd/server/server "${BACKEND_DIR}/" 2>/dev/null || true
-
-    # Restart service
-    if systemctl is-active --quiet freshbridge 2>/dev/null; then
-        log "Restarting freshbridge service..."
-        systemctl restart freshbridge
-    else
-        log "Backend binary built to ${BACKEND_DIR}/server"
-        log "Start manually: ${BACKEND_DIR}/server &"
-    fi
+    cp deploy/.env.production "${ENV_FILE}"
+    log "Created ${ENV_FILE} — PLEASE EDIT DB_DSN password!"
 fi
 
-# --- Frontend ---
-if ! $BACKEND_ONLY; then
-    log "Building frontend..."
-    cd "$(dirname "$0")/.."
-    (cd miniprogram && npm run build:h5) || err "Frontend build failed"
-
-    mkdir -p "${WEB_DIR}"
-    rm -rf "${WEB_DIR:?}"/*
-    cp -r miniprogram/dist/build/h5/* "${WEB_DIR}/"
-
-    # Reload nginx
-    if systemctl is-active --quiet nginx 2>/dev/null; then
-        log "Reloading nginx..."
-        cp deploy/nginx.conf "${NGINX_CONF}"
-        nginx -t && systemctl reload nginx
-    else
-        log "Frontend files copied to ${WEB_DIR}/"
-        log "Install nginx config: cp deploy/nginx.conf ${NGINX_CONF}"
-    fi
+# --- Restart service ---
+if systemctl is-active --quiet freshbridge 2>/dev/null; then
+    log "Restarting freshbridge service..."
+    systemctl restart freshbridge
+    systemctl status freshbridge --no-pager
+else
+    log "Installing systemd service..."
+    cp deploy/freshbridge.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable --now freshbridge
+    log "Service started. Check: systemctl status freshbridge"
 fi
 
-log "Deploy complete."
+log "Deploy complete — http://$(hostname -I 2>/dev/null | awk '{print $1}' || echo 'localhost'):8080"

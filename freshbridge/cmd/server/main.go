@@ -14,6 +14,7 @@ import (
 	"freshbridge/internal/middleware"
 	"freshbridge/internal/repository"
 	"freshbridge/internal/service"
+	"freshbridge/internal/static"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -107,6 +108,9 @@ func main() {
 	// Market data (no auth required)
 	r.GET("/api/market/prices", marketH.GetLatest)
 	r.GET("/api/market/prices/date", marketH.GetByDate)
+
+	// SPA frontend (embedded H5 build)
+	r.NoRoute(gin.WrapH(static.Handler()))
 
 	// Graceful shutdown
 	srv := &http.Server{
