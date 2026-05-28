@@ -11,7 +11,7 @@ func NewProductService(repo *repository.ProductRepo) *ProductService {
 	return &ProductService{repo}
 }
 
-func (s *ProductService) Create(p *model.Product) error {
+func ApplyProductDefaults(p *model.Product) {
 	p.Status = "published"
 	if p.PricingMode == "" {
 		p.PricingMode = "fixed"
@@ -28,6 +28,10 @@ func (s *ProductService) Create(p *model.Product) error {
 	if p.Grade == "" {
 		p.Grade = "一级果"
 	}
+}
+
+func (s *ProductService) Create(p *model.Product) error {
+	ApplyProductDefaults(p)
 	return s.repo.Create(p)
 }
 
