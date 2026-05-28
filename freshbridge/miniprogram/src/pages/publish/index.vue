@@ -6,17 +6,7 @@
       <text class="publish-sub">填写信息，让采购商找到您</text>
     </view>
 
-    <!-- Voice input component (primary interaction) -->
-    <voice-input class="voice-section" @result="onVoiceResult" />
-
-    <!-- Divider -->
-    <view class="divider">
-      <view class="divider-line"></view>
-      <text class="divider-text">或手动填写</text>
-      <view class="divider-line"></view>
-    </view>
-
-    <!-- Manual form -->
+    <!-- Product form -->
     <view class="form-section">
       <!-- 水果品种 (category picker) -->
       <view class="form-item">
@@ -218,7 +208,6 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { post } from '../../utils/api'
-import VoiceInput from '../../components/voice-input/index.vue'
 
 const form = reactive({
   category: '',
@@ -256,29 +245,6 @@ const tonValue = computed(() => {
 function onQuantityInput() {
   // Allow only digits and dot
   form.quantity = form.quantity.replace(/[^\d.]/g, '')
-}
-
-function onVoiceResult(e) {
-  const data = e.detail
-  if (data.quantity) form.quantity = String(data.quantity)
-  if (data.price) form.price = String(data.price)
-  if (data.variety) form.variety = data.variety
-  if (data.spec) form.spec = data.spec
-  if (data.packaging) form.packaging = data.packaging
-  if (data.grade) form.grade = data.grade
-
-  // Auto-detect category from variety
-  if (data.variety) {
-    if (data.variety.includes('富士') || data.variety.includes('苹果')) form.category = '苹果'
-    else if (data.variety.includes('脐橙') || data.variety.includes('柑橘')) form.category = '柑橘'
-    else if (data.variety.includes('芒果')) form.category = '芒果'
-    else if (data.variety.includes('葡萄')) form.category = '葡萄'
-    else if (data.variety.includes('樱桃')) form.category = '樱桃'
-    else if (data.variety.includes('荔枝')) form.category = '荔枝'
-    else if (data.variety.includes('猕猴桃')) form.category = '猕猴桃'
-  }
-
-  uni.showToast({ title: '语音识别成功，请核对信息', icon: 'success' })
 }
 
 function onCategoryChange(e) {

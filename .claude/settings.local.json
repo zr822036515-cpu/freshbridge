@@ -6,7 +6,30 @@
       "Bash('/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql' -u root freshbridge -e ' *)",
       "Bash(taskkill //f //im server.exe)",
       "Bash(./server.exe)",
-      "Bash(curl -s -X POST http://localhost:8080/api/auth/wechat-login -H 'Content-Type: application/json' -d '{\"code\":\"flowtest2\"}')"
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/wechat-login -H 'Content-Type: application/json' -d '{\"code\":\"flowtest2\"}')",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Bash(npm view *)",
+      "Bash(npx uni *)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(curl -s http://localhost:3000/api/market/prices)",
+      "Bash(GOFLAGS=-mod=mod GOPROXY=https://goproxy.cn,direct go build -o server.exe ./cmd/server/)",
+      "Read(//c/Go/bin/**)",
+      "Bash(where go *)",
+      "Bash(taskkill //F //PID 24196)",
+      "Bash(taskkill //F //IM server.exe)",
+      "Bash(\\\\\"C:/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe\\\\\" -u root -e \"SELECT id, category, variety, grade, packaging FROM freshbridge.products WHERE id=3\")",
+      "Bash(echo '{\"name\":\"陕西红富士苹果\",\"category\":\"苹果\",\"variety\":\"红富士\",\"spec\":\"80-85mm\",\"price\":5.8,\"total_quantity\":2000,\"origin_province\":\"陕西\",\"origin_city\":\"洛川\",\"images\":[\"https://img.example.com/1.jpg\"]}')",
+      "Read(//tmp/**)",
+      "Bash(python -c \"import json; d=json.load\\(open\\('/tmp/test_product.json'\\)\\); print\\('category:', d['category']\\); print\\('variety:', d['variety']\\)\")",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/wechat-login -H \"Content-Type: application/json\" -d '{\"code\":\"test_code_farmer_1\"}')",
+      "Bash(curl -s http://localhost:8080/api/health)",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/wechat-login -H \"Content-Type: application/json\" -d '{\"code\":\"test_code_stall_1\"}')",
+      "Bash(python -c ' *)",
+      "Bash(git reset *)"
     ]
   }
 }

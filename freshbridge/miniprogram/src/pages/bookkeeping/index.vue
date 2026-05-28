@@ -20,11 +20,6 @@
       </view>
     </view>
 
-    <!-- Tab content: 语音记账 -->
-    <view v-if="activeTab === 'voice'" class="tab-content">
-      <VoiceInput @result="onVoiceResult" />
-    </view>
-
     <!-- Tab content: 扫码记账 -->
     <view v-if="activeTab === 'scan'" class="tab-content">
       <view class="scan-area touch-target" @tap="onScanCode">
@@ -96,11 +91,6 @@
         <text class="total-value">¥ {{ totalAmount.toFixed(2) }}</text>
       </view>
 
-      <!-- Voice text display -->
-      <view v-if="voiceText" class="form-item voice-result">
-        <text class="voice-label-text">语音识别：</text>
-        <text class="voice-text-content">{{ voiceText }}</text>
-      </view>
     </view>
 
     <!-- Submit button -->
@@ -113,11 +103,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { get, post } from '../../utils/api'
-import VoiceInput from '../../components/voice-input/index.vue'
 
-const activeTab = ref('voice')
+const activeTab = ref('manual')
 const tabs = ref([
-  { key: 'voice', label: '语音记账', icon: '🎤' },
   { key: 'scan', label: '扫码记账', icon: '📷' },
   { key: 'manual', label: '手写录入', icon: '✍️' }
 ])
@@ -137,7 +125,6 @@ const selectedTradeLabel = computed(() => {
 
 const quantity = ref('')
 const price = ref('')
-const voiceText = ref('')
 const scanResult = ref('')
 
 const totalAmount = computed(() => {
@@ -178,26 +165,17 @@ async function submitSale() {
       product_id: trade.product_id,
       quantity: parseFloat(quantity.value),
       price: parseFloat(price.value),
-      record_method: activeTab.value === 'voice' ? 'voice' : activeTab.value === 'scan' ? 'scan' : 'manual',
-      voice_text: voiceText.value,
+      record_method: activeTab.value === 'scan' ? 'scan' : 'manual',
       sale_time: new Date().toISOString()
     })
     uni.showToast({ title: '记账成功', icon: 'success' })
     // Reset form
     quantity.value = ''
     price.value = ''
-    voiceText.value = ''
     scanResult.value = ''
   } catch (e) {
     uni.showToast({ title: '记账失败，请重试', icon: 'none' })
   }
-}
-
-function onVoiceResult(e) {
-  const d = e.detail || e
-  if (d.quantity != null) quantity.value = String(d.quantity)
-  if (d.price != null) price.value = String(d.price)
-  voiceText.value = d.rawText || d.raw || ''
 }
 
 function onScanCode() {
@@ -402,26 +380,6 @@ function onScanCode() {
   font-size: 40rpx;
   font-weight: 700;
   color: var(--accent);
-}
-
-.voice-result {
-  background-color: #F0FDF4;
-  border: 1px solid #BBF7D0;
-  border-radius: 8px;
-  padding: 16rpx;
-
-  .voice-label-text {
-    font-size: 32rpx;
-    color: var(--text-muted);
-    display: block;
-    margin-bottom: 8rpx;
-  }
-
-  .voice-text-content {
-    font-size: 32rpx;
-    color: var(--primary);
-    word-break: break-all;
-  }
 }
 
 /* Submit button */

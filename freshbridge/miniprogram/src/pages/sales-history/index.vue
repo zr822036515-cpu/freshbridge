@@ -201,7 +201,7 @@ function formatTime(dateStr) {
 }
 
 function methodIcon(method) {
-  const map = { voice: '🎤', scan: '📷', manual: '✍️' }
+  const map = { scan: '📷', manual: '✍️' }
   return map[method] || '✍️'
 }
 </script>

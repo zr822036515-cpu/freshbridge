@@ -1,0 +1,54 @@
+{
+  "products": [
+    {
+      "id": 4,
+      "farmer_id": 7,
+      "category": "葡萄",
+      "variety": "阳光玫瑰",
+      "spec": "15-18g/粒",
+      "grade": "一级果",
+      "total_quantity": 800,
+      "sold_quantity": 0,
+      "waste_quantity": 0,
+      "price": 25,
+      "pricing_mode": "fixed",
+      "commission_rate": 25,
+      "packaging": "纸箱",
+      "min_order": 500,
+      "origin_province": "云南",
+      "origin_city": "大理",
+      "origin_district": "",
+      "images": [],
+      "urgent": 0,
+      "status": "published",
+      "created_at": "2026-05-28T10:30:14Z",
+      "updated_at": "2026-05-28T10:30:14Z"
+    },
+    {
+      "id": 3,
+      "farmer_id": 7,
+      "category": "ƻ��",
+      "variety": "�츻ʿ",
+      "spec": "80-85mm",
+      "grade": "一级果",
+      "total_quantity": 2000,
+      "sold_quantity": 100,
+      "waste_quantity": 0,
+      "price": 5.8,
+      "pricing_mode": "fixed",
+      "commission_rate": 25,
+      "packaging": "纸箱",
+      "min_order": 500,
+      "origin_province": "����",
+      "origin_city": "�崨",
+      "origin_district": "",
+      "images": [
+        "https://img.example.com/1.jpg"
+      ],
+      "urgent": 0,
+      "status": "published",
+      "created_at": "2026-05-28T10:25:51Z",
+      "updated_at": "2026-05-28T18:25:52Z"
+    }
+  ]
+}
