@@ -1,0 +1,120 @@
+/* ============================================
+   鲜桥 FreshBridge — Design System
+   uni-app Global Styles
+   ============================================ */
+
+/* ----- CSS Custom Properties ----- */
+page {
+  /* Primary: agriculture earth green */
+  --primary: #15803D;
+  --primary-light: #22C55E;
+
+  /* Accent: harvest gold */
+  --accent: #CA8A04;
+
+  /* Semantic */
+  --danger: #DC2626;
+
+  /* Background */
+  --bg: #F0FDF4;
+  --bg-light: #F7FEE7;
+
+  /* Text */
+  --text: #14532D;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+
+  /* Border */
+  --border: #E5E7EB;
+
+  /* White */
+  --white: #FFFFFF;
+
+  /* Typography */
+  font-size: 16px;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* ----- Buttons ----- */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12rpx 32rpx;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+.btn-accent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12rpx 32rpx;
+  background-color: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.btn-accent:active {
+  opacity: 0.85;
+}
+
+/* ----- Cards ----- */
+.card {
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  margin-bottom: 16rpx;
+}
+
+/* ----- Amount display ----- */
+.amount {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.amount-green {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.amount-gold {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+/* ----- Touch target (minimum 44px) ----- */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
