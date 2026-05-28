@@ -55,6 +55,40 @@
       </view>
     </view>
 
+    <!-- Market prices section -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">今日行情</text>
+      </view>
+
+      <!-- Loading -->
+      <view v-if="marketLoading" class="loading-box">
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <!-- Price cards — horizontal scroll -->
+      <scroll-view v-if="!marketLoading && marketPrices.length > 0" scroll-x class="price-scroll">
+        <view class="price-list">
+          <view v-for="item in marketPrices" :key="item.id || item.variety" class="price-card card">
+            <text class="price-variety">{{ item.variety }}</text>
+            <view class="price-main">
+              <text class="price-number">¥{{ fmtPrice(item.price) }}</text>
+              <text class="price-unit">/斤</text>
+            </view>
+            <view class="price-change" :class="item.change_pct >= 0 ? 'up' : 'down'">
+              <text>{{ item.change_pct >= 0 ? '▲' : '▼' }}{{ fmtPct(item.change_pct) }}</text>
+            </view>
+            <text class="price-market">{{ item.market || item.market_name || '' }}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <!-- Empty -->
+      <view v-if="!marketLoading && marketPrices.length === 0" class="card">
+        <text class="empty-text">暂无行情数据</text>
+      </view>
+    </view>
+
     <!-- Hot categories ranking -->
     <view class="section">
       <view class="section-header">
@@ -84,8 +118,10 @@ import { onShow } from '@dcloudio/uni-app'
 import { get } from '../../utils/api'
 
 const loading = ref(false)
+const marketLoading = ref(false)
 const today = ref(getToday())
 const latestProducts = ref([])
+const marketPrices = ref([])
 
 function getToday() {
   const d = new Date()
@@ -93,6 +129,31 @@ function getToday() {
   const month = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+function fmtPrice(val) {
+  const n = Number(val)
+  if (!n) return '--'
+  return n.toFixed(2)
+}
+
+function fmtPct(val) {
+  const n = Number(val)
+  if (!n && n !== 0) return '--'
+  return Math.abs(n).toFixed(1) + '%'
+}
+
+async function fetchMarketPrices() {
+  marketLoading.value = true
+  try {
+    const res = await get('/market/prices')
+    const list = res.prices || res.data || []
+    marketPrices.value = list.slice(0, 8)
+  } catch (e) {
+    console.error('Failed to fetch market prices:', e)
+  } finally {
+    marketLoading.value = false
+  }
 }
 
 async function fetchLatestProducts() {
@@ -115,6 +176,7 @@ function goToSupply() {
 
 onShow(() => {
   fetchLatestProducts()
+  fetchMarketPrices()
 })
 </script>
 
@@ -277,5 +339,75 @@ onShow(() => {
   text-align: center;
   display: block;
   padding: 32rpx 0;
+}
+
+/* Market prices horizontal scroll */
+.price-scroll {
+  white-space: nowrap;
+}
+
+.price-list {
+  display: inline-flex;
+  gap: 16rpx;
+  padding-bottom: 8rpx;
+}
+
+.price-card {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 220rpx;
+  padding: 20rpx;
+  margin-bottom: 0;
+  white-space: normal;
+}
+
+.price-variety {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price-main {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  margin-bottom: 8rpx;
+}
+
+.price-number {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.price-unit {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.price-change {
+  font-size: 24rpx;
+  margin-bottom: 8rpx;
+}
+
+.price-change.up {
+  color: var(--primary);
+}
+
+.price-change.down {
+  color: var(--danger);
+}
+
+.price-market {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

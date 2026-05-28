@@ -20,6 +20,26 @@
       }
     },
     {
+      "path": "pages/settlement/index",
+      "style": {
+        "navigationBarTitleText": "结算对账",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/logistics/index",
+      "style": {
+        "navigationBarTitleText": "运单大厅",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/tracking/index",
+      "style": {
+        "navigationBarTitleText": "在途追踪"
+      }
+    },
+    {
       "path": "pages/home/index",
       "style": {
         "navigationBarTitleText": "首页"

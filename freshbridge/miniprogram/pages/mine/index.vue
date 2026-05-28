@@ -143,7 +143,7 @@ function onNavTap(label) {
     '我的货源': '/pages/supply/index',
     '代卖管理': '/pages/consignment/index',
     '销售记录': '/pages/sales-history/index',
-    '结算对账': null,
+    '结算对账': '/pages/settlement/index',
     '实名认证': null,
     '设置': null
   }
