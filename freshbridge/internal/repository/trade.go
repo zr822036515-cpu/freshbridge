@@ -42,6 +42,15 @@ func (r *TradeRepo) CreateSale(sr *model.SalesRecord) error {
 	})
 }
 
+func (r *TradeRepo) FindProductsByIDs(ids []int64) ([]model.Product, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var products []model.Product
+	err := r.db.Where("id IN ?", ids).Find(&products).Error
+	return products, err
+}
+
 func (r *TradeRepo) GetSalesByTrade(tradeID int64) ([]model.SalesRecord, error) {
 	var records []model.SalesRecord
 	err := r.db.Where("trade_id = ?", tradeID).Order("sale_time DESC").Find(&records).Error

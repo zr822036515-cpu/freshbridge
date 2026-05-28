@@ -147,7 +147,7 @@ async function fetchMarketPrices() {
   marketLoading.value = true
   try {
     const res = await get('/market/prices')
-    const list = res.prices || res.data || []
+    const list = res.prices || []
     marketPrices.value = list.slice(0, 8)
   } catch (e) {
     console.error('Failed to fetch market prices:', e)
@@ -160,9 +160,7 @@ async function fetchLatestProducts() {
   loading.value = true
   try {
     const res = await get('/products', { page: 1, page_size: 4 })
-    // Handle both response shapes: { data: [...] } or direct array
-    const list = res.data || res || []
-    latestProducts.value = list.slice(0, 4)
+    latestProducts.value = (res.products || []).slice(0, 4)
   } catch (e) {
     console.error('Failed to fetch latest products:', e)
   } finally {

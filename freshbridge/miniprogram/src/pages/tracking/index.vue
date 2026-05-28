@@ -150,7 +150,7 @@ async function loadDelivery() {
     const page = pages[pages.length - 1]
     const id = (page && page.options && page.options.id) || null
 
-    const list = res.deliveries || res.data || []
+    const list = res.logistics || []
     if (id) {
       // Fetch single or find from list
       try {

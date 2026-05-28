@@ -150,7 +150,7 @@ async function loadDeliveries() {
     } else {
       res = await get('/logistics/my', { status: activeTab.value })
     }
-    deliveries.value = res.deliveries || res.data || []
+    deliveries.value = res.logistics || []
   } catch (e) {
     deliveries.value = []
   } finally {

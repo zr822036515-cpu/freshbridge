@@ -141,7 +141,7 @@ async function loadSettlements() {
       year: currentYear.value,
       month: currentMonth.value
     })
-    settlements.value = res.settlements || res.data || []
+    settlements.value = res.settlements || []
     recalcSummary()
   } catch (e) {
     settlements.value = []

@@ -127,7 +127,7 @@ async function fetchProducts(reset = false) {
 
   try {
     const res = await get('/products', params)
-    const list = res.data || res || []
+    const list = res.products || []
     if (reset) {
       products.value = list
     } else {
@@ -176,7 +176,7 @@ function statusText(status) {
 
 async function onMakeOffer(item) {
   try {
-    await post('/trades', { product_id: item.id })
+    await post('/trades', { product_id: item.id, farmer_id: item.farmer_id, commission_rate: item.commission_rate || 25 })
     uni.showToast({ title: '已发起代卖意向', icon: 'success' })
   } catch (e) {
     uni.showToast({ title: '发起失败，请重试', icon: 'none' })

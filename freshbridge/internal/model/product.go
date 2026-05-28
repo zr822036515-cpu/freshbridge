@@ -17,11 +17,11 @@ type Product struct {
 	CommissionRate int       `gorm:"column:commission_rate" json:"commission_rate"`
 	Packaging      string    `json:"packaging"`
 	MinOrder       float64   `gorm:"column:min_order" json:"min_order"`
-	AvailableDate  string    `gorm:"column:available_date" json:"available_date"`
+	AvailableDate  *string   `gorm:"column:available_date" json:"available_date,omitempty"`
 	OriginProvince string    `gorm:"column:origin_province" json:"origin_province"`
 	OriginCity     string    `gorm:"column:origin_city" json:"origin_city"`
 	OriginDistrict string    `gorm:"column:origin_district" json:"origin_district"`
-	Images         string    `json:"images"`
+	Images         []string  `gorm:"serializer:json" json:"images"`
 	Urgent         int       `json:"urgent"`
 	Status         string    `json:"status"`
 	CreatedAt      time.Time `json:"created_at"`

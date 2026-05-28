@@ -342,7 +342,7 @@ async function submit() {
       available_date: form.available_date,
       origin_province: form.origin_province,
       origin_city: form.origin_city,
-      images: JSON.stringify(form.images),
+      images: form.images,
       urgent: form.urgent ? 1 : 0
     })
     uni.showToast({ title: '发布成功！', icon: 'success' })

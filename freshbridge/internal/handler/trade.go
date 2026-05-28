@@ -76,17 +76,42 @@ func (h *TradeHandler) RecordSale(c *gin.Context) {
 	c.JSON(http.StatusCreated, sr)
 }
 
-// GET /api/trades/my — list my trades (both farmer and stall roles)
+// GET /api/trades/my — list my trades with product info
 func (h *TradeHandler) ListMy(c *gin.Context) {
 	userID := c.GetInt64("user_id")
-	// Query both sides — a user may be farmer on some trades and stall on others
 	farmerTrades, _ := h.repo.FindByFarmer(userID)
 	stallTrades, _ := h.repo.FindByStall(userID)
 	allTrades := append(farmerTrades, stallTrades...)
 	if allTrades == nil {
 		allTrades = []model.TradeOrder{}
 	}
-	c.JSON(http.StatusOK, gin.H{"trades": allTrades})
+
+	// Collect product IDs and fetch product info
+	productIDs := make([]int64, 0, len(allTrades))
+	for _, t := range allTrades {
+		productIDs = append(productIDs, t.ProductID)
+	}
+	products, _ := h.repo.FindProductsByIDs(productIDs)
+	productMap := make(map[int64]model.Product)
+	for _, p := range products {
+		productMap[p.ID] = p
+	}
+
+	// Build response with product info merged into each trade
+	type tradeWithProduct struct {
+		model.TradeOrder
+		Product *model.Product `json:"product,omitempty"`
+	}
+	result := make([]tradeWithProduct, 0, len(allTrades))
+	for _, t := range allTrades {
+		twp := tradeWithProduct{TradeOrder: t}
+		if p, ok := productMap[t.ProductID]; ok {
+			twp.Product = &p
+		}
+		result = append(result, twp)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"trades": result})
 }
 
 // GET /api/trades/:id/sales — get sales records for a trade

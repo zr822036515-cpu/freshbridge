@@ -45,7 +45,7 @@
         <view class="trade-origin">
           <text class="origin-icon">📍</text>
           <text class="origin-text">
-            {{ trade.farmer_origin_province || '' }} {{ trade.farmer_origin_city || '' }}
+            {{ trade.product ? trade.product.origin_province + ' ' + trade.product.origin_city : '' }}
           </text>
         </view>
 
@@ -56,7 +56,7 @@
               已售
               <text class="progress-highlight">{{ soldAmount(trade) }}</text>
               /
-              <text>{{ trade.total_quantity || 0 }}</text>
+              <text>{{ trade.product ? trade.product.total_quantity : 0 }}</text>
               斤
             </text>
             <text class="progress-percent">{{ soldPercent(trade) }}%</text>
@@ -72,7 +72,7 @@
             佣金 {{ trade.commission_rate || 0 }}%
           </text>
           <text class="meta-item">
-            {{ trade.pricing_mode === 'agreed' ? '约定价' : trade.pricing_mode === 'market' ? '随行就市' : '面议' }}
+            {{ trade.pricing_mode === 'fixed' ? '固定价' : trade.pricing_mode === 'floor_share' ? '保底分成' : '面议' }}
           </text>
           <view class="status-badge" :class="'status-' + (trade.status || '')">
             <text>{{ statusLabel(trade.status) }}</text>
@@ -139,12 +139,12 @@ async function fetchTrades() {
 fetchTrades()
 
 function soldAmount(trade) {
-  return trade.sold_quantity || 0
+  return trade.product ? (trade.product.sold_quantity || 0) : 0
 }
 
 function soldPercent(trade) {
-  const total = trade.total_quantity || 1
-  const sold = trade.sold_quantity || 0
+  const total = trade.product ? (trade.product.total_quantity || 1) : 1
+  const sold = trade.product ? (trade.product.sold_quantity || 0) : 0
   return Math.round((sold / total) * 100)
 }
 
