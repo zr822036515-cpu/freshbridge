@@ -25,6 +25,7 @@ func main() {
 	// Init repos
 	userRepo := repository.NewUserRepo(db)
 	productRepo := repository.NewProductRepo(db)
+	tradeRepo := repository.NewTradeRepo(db)
 
 	// Init services
 	authSvc := service.NewAuthService(cfg, userRepo)
@@ -33,6 +34,7 @@ func main() {
 	// Init handlers
 	authH := handler.NewAuthHandler(authSvc)
 	productH := handler.NewProductHandler(productSvc)
+	tradeH := handler.NewTradeHandler(tradeRepo)
 
 	r := gin.Default()
 	r.Use(middleware.CORS())
@@ -55,6 +57,11 @@ func main() {
 		auth.GET("/products", productH.Search)
 		auth.GET("/products/my", productH.ListMy)
 		auth.GET("/products/:id", productH.GetByID)
+			auth.POST("/trades", tradeH.Create)
+			auth.PUT("/trades/:id/accept", tradeH.Accept)
+			auth.GET("/trades/my", tradeH.ListMy)
+			auth.GET("/trades/:id/sales", tradeH.GetSales)
+			auth.POST("/sales", tradeH.RecordSale)
 	}
 
 	r.Run(":" + cfg.Port)
