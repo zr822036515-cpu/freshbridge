@@ -139,8 +139,20 @@ function onSwitchRole() {
 }
 
 function onNavTap(label) {
-  console.log('Navigate to:', label)
-  uni.showToast({ title: label + '开发中', icon: 'none' })
+  const routes = {
+    '我的货源': '/pages/supply/index',
+    '代卖管理': '/pages/consignment/index',
+    '销售记录': '/pages/sales-history/index',
+    '结算对账': null,
+    '实名认证': null,
+    '设置': null
+  }
+  const url = routes[label]
+  if (url) {
+    uni.navigateTo({ url })
+  } else {
+    uni.showToast({ title: label + '开发中', icon: 'none' })
+  }
 }
 
 function onLogout() {

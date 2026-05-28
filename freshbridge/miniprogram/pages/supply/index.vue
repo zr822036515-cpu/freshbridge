@@ -68,6 +68,12 @@
           <text class="footer-date" v-if="item.available_date">{{ item.available_date }} 可发</text>
           <text class="footer-status">{{ statusText(item.status) }}</text>
         </view>
+
+        <view class="card-actions">
+          <view class="offer-btn btn-primary touch-target" @tap.stop="onMakeOffer(item)">
+            <text>接单</text>
+          </view>
+        </view>
       </view>
 
       <!-- Empty state -->
@@ -93,7 +99,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { onShow, onPullDownRefresh } from '@dcloudio/uni-app'
-import { get } from '../../utils/api'
+import { get, post } from '../../utils/api'
 
 const keyword = ref('')
 const activeCategory = ref('全部')
@@ -166,6 +172,15 @@ function statusText(status) {
     3: '已下架'
   }
   return map[status] || '未知'
+}
+
+async function onMakeOffer(item) {
+  try {
+    await post('/trades', { product_id: item.id })
+    uni.showToast({ title: '已发起代卖意向', icon: 'success' })
+  } catch (e) {
+    uni.showToast({ title: '发起失败，请重试', icon: 'none' })
+  }
 }
 
 // Lifecycle
@@ -319,6 +334,20 @@ onPullDownRefresh(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.card-actions {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid #F3F4F6;
+
+  .offer-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 32rpx;
+    font-weight: 500;
+  }
 }
 
 .footer-tags {

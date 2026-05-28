@@ -1,6 +1,25 @@
 {
   "pages": [
     {
+      "path": "pages/bookkeeping/index",
+      "style": {
+        "navigationBarTitleText": "快速记账"
+      }
+    },
+    {
+      "path": "pages/consignment/index",
+      "style": {
+        "navigationBarTitleText": "代卖管理"
+      }
+    },
+    {
+      "path": "pages/sales-history/index",
+      "style": {
+        "navigationBarTitleText": "销售记录",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
       "path": "pages/home/index",
       "style": {
         "navigationBarTitleText": "首页"
