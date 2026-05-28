@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"freshbridge/internal/config"
 	"freshbridge/internal/handler"
@@ -45,6 +46,8 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
+	r.Use(middleware.RateLimit(100, time.Minute))
+	r.Use(middleware.MaxBodySize(1 << 20)) // 1MB
 
 	// Health
 	r.GET("/api/health", func(c *gin.Context) {
