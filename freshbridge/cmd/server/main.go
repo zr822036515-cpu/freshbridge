@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"freshbridge/internal/config"
@@ -18,10 +23,22 @@ import (
 func main() {
 	cfg := config.Load()
 
+	// Production mode
+	gin.SetMode(cfg.GinMode)
+
 	db, err := gorm.Open(mysql.Open(cfg.DB_DSN), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
+
+	// Connection pool
+	sqlDB, _ := db.DB()
+	sqlDB.SetMaxOpenConns(cfg.DBMaxOpenConns)
+	sqlDB.SetMaxIdleConns(cfg.DBMaxIdleConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cfg.DBConnMaxLifetime) * time.Second)
+
+	// Database tables managed by migrations/001_init.sql
+	// Run manually: mysql -u root < migrations/001_init.sql
 
 	// Init repos
 	userRepo := repository.NewUserRepo(db)
@@ -43,15 +60,20 @@ func main() {
 	logisticsH := handler.NewLogisticsHandler(logisticsRepo)
 	marketH := handler.NewMarketHandler(marketPriceRepo)
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
 	r.Use(middleware.RateLimit(100, time.Minute))
 	r.Use(middleware.MaxBodySize(1 << 20)) // 1MB
 
-	// Health
+	// Health with DB check
 	r.GET("/api/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
+		if err := sqlDB.Ping(); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy", "db": "disconnected"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	// Auth (no token required)
@@ -84,5 +106,30 @@ func main() {
 	r.GET("/api/market/prices", marketH.GetLatest)
 	r.GET("/api/market/prices/date", marketH.GetByDate)
 
-	r.Run(":" + cfg.Port)
+	// Graceful shutdown
+	srv := &http.Server{
+		Addr:    ":" + cfg.Port,
+		Handler: r,
+	}
+
+	go func() {
+		log.Printf("server starting on :%s (mode=%s)", cfg.Port, cfg.GinMode)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("shutting down...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("forced shutdown: %v", err)
+	}
+	sqlDB.Close()
+	log.Println("server stopped")
 }
