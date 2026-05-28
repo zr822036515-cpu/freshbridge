@@ -81,6 +81,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { get } from '../../utils/api'
 
 const loading = ref(true)
@@ -148,7 +149,9 @@ async function fetchSales() {
   }
 }
 
-fetchSales()
+onShow(() => {
+  fetchSales()
+})
 
 function getFilteredSales() {
   const now = new Date()

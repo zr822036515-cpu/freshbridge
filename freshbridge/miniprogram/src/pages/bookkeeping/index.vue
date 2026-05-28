@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { get, post } from '../../utils/api'
 
 const activeTab = ref('manual')
@@ -136,12 +137,26 @@ async function loadTrades() {
     const res = await get('/trades/my')
     const all = res.trades || []
     trades.value = all.filter(t => t.status === 'accepted' || t.status === 'selling')
+
+    // Auto-select trade from navigation param
+    const pages = getCurrentPages()
+    const page = pages[pages.length - 1]
+    const tradeId = (page && page.options && page.options.tradeId) || null
+    if (tradeId) {
+      const idx = trades.value.findIndex(t => String(t.id) === String(tradeId))
+      if (idx >= 0) {
+        selectedTradeIndex.value = idx
+        selectedTradeId.value = trades.value[idx].id
+      }
+    }
   } catch (e) {
     console.error('Failed to load trades:', e)
   }
 }
 
-loadTrades()
+onShow(() => {
+  loadTrades()
+})
 
 function onTradeChange(e) {
   const idx = e.detail ? e.detail.value : e.value

@@ -103,6 +103,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { get } from '../../utils/api'
 
 const loading = ref(true)
@@ -136,7 +137,9 @@ async function fetchTrades() {
   }
 }
 
-fetchTrades()
+onShow(() => {
+  fetchTrades()
+})
 
 function soldAmount(trade) {
   return trade.product ? (trade.product.sold_quantity || 0) : 0

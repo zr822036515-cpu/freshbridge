@@ -99,7 +99,9 @@ func main() {
 		auth.GET("/logistics/available", logisticsH.ListAvailable)
 		auth.GET("/logistics/my", logisticsH.ListMy)
 		auth.PUT("/logistics/:id/accept", logisticsH.Accept)
+		auth.GET("/logistics/:id", logisticsH.GetByID)
 		auth.PUT("/logistics/:id/gps", logisticsH.UpdateGPS)
+		auth.PUT("/logistics/:id/arrive", logisticsH.Arrive)
 	}
 
 	// Market data (no auth required)
