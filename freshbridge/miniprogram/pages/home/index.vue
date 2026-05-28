@@ -19,11 +19,47 @@
       </view>
     </view>
 
+    <!-- Latest products section -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">最新货源</text>
+        <text class="section-more" @tap="goToSupply">查看更多 &#8250;</text>
+      </view>
+
+      <!-- Loading -->
+      <view v-if="loading" class="loading-box">
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <!-- Product mini cards -->
+      <view v-if="!loading && latestProducts.length > 0" class="latest-list">
+        <view v-for="item in latestProducts" :key="item.id" class="mini-card card">
+          <view class="mini-card-top">
+            <text class="mini-variety">{{ item.variety }}</text>
+            <text v-if="item.urgent" class="urgent-mini">&#9889; 急售</text>
+          </view>
+          <view class="mini-card-info">
+            <text class="mini-spec" v-if="item.spec">{{ item.spec }}</text>
+            <text class="mini-origin">{{ item.origin_province }}{{ item.origin_city }}</text>
+          </view>
+          <view class="mini-card-bottom">
+            <text class="mini-quantity">{{ item.total_quantity }}斤</text>
+            <text class="mini-price amount-gold">{{ item.price }} 元/斤</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Empty -->
+      <view v-if="!loading && latestProducts.length === 0" class="card">
+        <text class="empty-text">暂无最新货源</text>
+      </view>
+    </view>
+
     <!-- Hot categories ranking -->
     <view class="section">
       <view class="section-header">
         <text class="section-title">热门品类排行</text>
-        <text class="section-more">查看更多 ></text>
+        <text class="section-more">查看更多 &#8250;</text>
       </view>
       <view class="card">
         <text class="empty-text">各品类交易数据将在接入后展示</text>
@@ -44,9 +80,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { get } from '../../utils/api'
 
 const loading = ref(false)
 const today = ref(getToday())
+const latestProducts = ref([])
 
 function getToday() {
   const d = new Date()
@@ -55,6 +94,28 @@ function getToday() {
   const day = String(d.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+async function fetchLatestProducts() {
+  loading.value = true
+  try {
+    const res = await get('/products', { page: 1, page_size: 4 })
+    // Handle both response shapes: { data: [...] } or direct array
+    const list = res.data || res || []
+    latestProducts.value = list.slice(0, 4)
+  } catch (e) {
+    console.error('Failed to fetch latest products:', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+function goToSupply() {
+  uni.switchTab({ url: '/pages/supply/index' })
+}
+
+onShow(() => {
+  fetchLatestProducts()
+})
 </script>
 
 <style scoped lang="scss">
@@ -129,8 +190,85 @@ function getToday() {
 }
 
 .section-more {
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: var(--primary);
+}
+
+/* Loading */
+.loading-box {
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--text-muted);
+}
+
+/* Latest product mini cards */
+.latest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.mini-card {
+  padding: 20rpx 24rpx;
+
+  &-top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8rpx;
+  }
+
+  &-info {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    margin-bottom: 12rpx;
+  }
+
+  &-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.mini-variety {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.urgent-mini {
+  font-size: 22rpx;
+  color: var(--accent);
+  background-color: #FEF3C7;
+  padding: 2rpx 10rpx;
+  border-radius: 4px;
+  margin-left: 10rpx;
+}
+
+.mini-spec {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.mini-origin {
+  font-size: 26rpx;
+  color: var(--text-muted);
+}
+
+.mini-quantity {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mini-price {
+  font-size: 30rpx;
+  font-weight: 700;
 }
 
 .empty-text {
