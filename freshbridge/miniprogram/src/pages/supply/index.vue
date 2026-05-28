@@ -28,6 +28,12 @@
       </view>
     </scroll-view>
 
+    <!-- Mine filter bar -->
+    <view v-if="filterMine" class="filter-bar">
+      <text class="filter-bar-text">我的货源</text>
+      <text class="filter-bar-clear" @tap="clearMineFilter">查看全部 &#8250;</text>
+    </view>
+
     <!-- Product list -->
     <view class="product-list">
       <!-- Loading -->
@@ -108,6 +114,7 @@ const loadingMore = ref(false)
 const products = ref([])
 const page = ref(1)
 const hasMore = ref(true)
+const filterMine = ref(false)
 const categories = ref(['全部', '苹果', '柑橘', '芒果', '葡萄', '蔬菜'])
 
 // Fetch products from API
@@ -118,33 +125,39 @@ async function fetchProducts(reset = false) {
     loading.value = true
   }
 
-  const params = {
-    page: page.value,
-    page_size: 10
-  }
-  if (keyword.value) params.keyword = keyword.value
-  if (activeCategory.value !== '全部') params.category = activeCategory.value
-
   try {
-    const res = await get('/products', params)
+    let res
+    if (filterMine.value) {
+      // My products — no pagination needed for MVP
+      res = await get('/products/my')
+    } else {
+      const params = { page: page.value, page_size: 10 }
+      if (keyword.value) params.keyword = keyword.value
+      if (activeCategory.value !== '全部') params.category = activeCategory.value
+      res = await get('/products', params)
+    }
     const list = res.products || []
     if (reset) {
       products.value = list
     } else {
       products.value.push(...list)
     }
-    if (list.length < 10) {
+    if (filterMine.value || list.length < 10) {
       hasMore.value = false
     }
   } catch (e) {
-    if (reset) {
-      products.value = []
-    }
+    if (reset) products.value = []
     console.error('Failed to fetch products:', e)
   } finally {
     loading.value = false
     loadingMore.value = false
   }
+}
+
+function clearMineFilter() {
+  filterMine.value = false
+  uni.removeStorageSync('supply_filter_mine')
+  fetchProducts(true)
 }
 
 function onSearch() {
@@ -185,6 +198,10 @@ async function onMakeOffer(item) {
 
 // Lifecycle
 onShow(() => {
+  if (uni.getStorageSync('supply_filter_mine')) {
+    filterMine.value = true
+    uni.removeStorageSync('supply_filter_mine')
+  }
   fetchProducts(true)
 })
 
@@ -225,6 +242,32 @@ onPullDownRefresh(() => {
   flex: 1;
   font-size: 32rpx;
   color: var(--text);
+}
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background-color: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 8px;
+  margin-bottom: 16rpx;
+
+  .filter-bar-text {
+    font-size: 32rpx;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .filter-bar-clear {
+    font-size: 32rpx;
+    color: var(--primary);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .category-scroll {

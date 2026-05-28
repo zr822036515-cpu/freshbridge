@@ -37,15 +37,15 @@
     <!-- Quick stats -->
     <view class="stats-row">
       <view class="stats-item">
-        <text class="stats-value">0</text>
+        <text class="stats-value">{{ stats.products }}</text>
         <text class="stats-label">在售货源</text>
       </view>
       <view class="stats-item">
-        <text class="stats-value">0</text>
+        <text class="stats-value">{{ stats.trades }}</text>
         <text class="stats-label">代卖订单</text>
       </view>
       <view class="stats-item">
-        <text class="stats-value">0.00</text>
+        <text class="stats-value">{{ stats.pendingAmount }}</text>
         <text class="stats-label">待结算(元)</text>
       </view>
     </view>
@@ -101,12 +101,38 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { login, getUserInfo, logout } from '../../utils/auth'
+import { get } from '../../utils/api'
 
 const userInfo = ref(null)
+const stats = ref({ products: 0, trades: 0, pendingAmount: '0.00' })
 
-// Try to restore user info on load
 userInfo.value = getUserInfo()
+
+async function fetchStats() {
+  if (!userInfo.value) return
+  try {
+    const [prodRes, tradeRes, settleRes] = await Promise.all([
+      get('/products/my').catch(() => ({ products: [] })),
+      get('/trades/my').catch(() => ({ trades: [] })),
+      get('/settlements').catch(() => ({ settlements: [] }))
+    ])
+    stats.value.products = (prodRes.products || []).length
+    stats.value.trades = (tradeRes.trades || []).length
+    const pending = (settleRes.settlements || []).reduce(
+      (sum, s) => sum + (parseFloat(s.total_amount) || 0), 0
+    )
+    stats.value.pendingAmount = pending.toFixed(2)
+  } catch (e) {
+    console.error('Failed to fetch stats:', e)
+  }
+}
+
+onShow(() => {
+  userInfo.value = getUserInfo()
+  fetchStats()
+})
 
 const loginSubtitle = computed(() => {
   if (!userInfo.value) return '登录后可发布货源'
@@ -148,7 +174,10 @@ function onNavTap(label) {
     '设置': null
   }
   const url = routes[label]
-  if (url) {
+  if (label === '我的货源') {
+    uni.setStorageSync('supply_filter_mine', '1')
+    uni.switchTab({ url })
+  } else if (url) {
     uni.navigateTo({ url })
   } else {
     uni.showToast({ title: label + '开发中', icon: 'none' })

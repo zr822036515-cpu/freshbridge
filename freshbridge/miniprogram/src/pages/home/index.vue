@@ -8,14 +8,14 @@
     <!-- Market overview cards -->
     <view class="overview-row">
       <view class="overview-card card">
-        <text class="overview-label">今日平台交易额</text>
-        <text class="overview-value amount-green">--</text>
-        <text class="overview-sub">数据加载中</text>
+        <text class="overview-label">平台在售总数</text>
+        <text class="overview-value amount-green">{{ overview.productTotal || '--' }}</text>
+        <text class="overview-sub">斤</text>
       </view>
       <view class="overview-card card">
-        <text class="overview-label">在售品种数</text>
-        <text class="overview-value amount-green">--</text>
-        <text class="overview-sub">数据加载中</text>
+        <text class="overview-label">行情品种</text>
+        <text class="overview-value amount-green">{{ overview.marketCount || '--' }}</text>
+        <text class="overview-sub">个品种</text>
       </view>
     </view>
 
@@ -122,6 +122,7 @@ const marketLoading = ref(false)
 const today = ref(getToday())
 const latestProducts = ref([])
 const marketPrices = ref([])
+const overview = ref({ productTotal: 0, marketCount: 0 })
 
 function getToday() {
   const d = new Date()
@@ -149,6 +150,7 @@ async function fetchMarketPrices() {
     const res = await get('/market/prices')
     const list = res.prices || []
     marketPrices.value = list.slice(0, 8)
+    overview.value.marketCount = list.length
   } catch (e) {
     console.error('Failed to fetch market prices:', e)
   } finally {
@@ -161,6 +163,7 @@ async function fetchLatestProducts() {
   try {
     const res = await get('/products', { page: 1, page_size: 4 })
     latestProducts.value = (res.products || []).slice(0, 4)
+    overview.value.productTotal = res.total || 0
   } catch (e) {
     console.error('Failed to fetch latest products:', e)
   } finally {
