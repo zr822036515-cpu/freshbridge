@@ -24,12 +24,15 @@ func main() {
 
 	// Init repos
 	userRepo := repository.NewUserRepo(db)
+	productRepo := repository.NewProductRepo(db)
 
 	// Init services
 	authSvc := service.NewAuthService(cfg, userRepo)
+	productSvc := service.NewProductService(productRepo)
 
 	// Init handlers
 	authH := handler.NewAuthHandler(authSvc)
+	productH := handler.NewProductHandler(productSvc)
 
 	r := gin.Default()
 	r.Use(middleware.CORS())
@@ -48,6 +51,10 @@ func main() {
 	auth.Use(middleware.AuthRequired(cfg.JWTSecret))
 	{
 		auth.GET("/user/profile", authH.Profile)
+		auth.POST("/products", productH.Create)
+		auth.GET("/products", productH.Search)
+		auth.GET("/products/my", productH.ListMy)
+		auth.GET("/products/:id", productH.GetByID)
 	}
 
 	r.Run(":" + cfg.Port)
