@@ -1,0 +1,124 @@
+{
+  "pages": [
+    {
+      "path": "pages/bookkeeping/index",
+      "style": {
+        "navigationBarTitleText": "快速记账"
+      }
+    },
+    {
+      "path": "pages/consignment/index",
+      "style": {
+        "navigationBarTitleText": "代卖管理"
+      }
+    },
+    {
+      "path": "pages/sales-history/index",
+      "style": {
+        "navigationBarTitleText": "销售记录",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/settlement/index",
+      "style": {
+        "navigationBarTitleText": "结算对账",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/logistics/index",
+      "style": {
+        "navigationBarTitleText": "运单大厅",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/tracking/index",
+      "style": {
+        "navigationBarTitleText": "在途追踪"
+      }
+    },
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/supply/index",
+      "style": {
+        "navigationBarTitleText": "货源",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/publish/index",
+      "style": {
+        "navigationBarTitleText": "发布"
+      }
+    },
+    {
+      "path": "pages/message/index",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "鲜桥",
+    "navigationBarBackgroundColor": "#15803D",
+    "backgroundColor": "#F0FDF4",
+    "backgroundColorTop": "#F0FDF4",
+    "backgroundColorBottom": "#F0FDF4"
+  },
+  "tabBar": {
+    "color": "#9CA3AF",
+    "selectedColor": "#15803D",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/images/home.png",
+        "selectedIconPath": "static/images/home-active.png"
+      },
+      {
+        "pagePath": "pages/supply/index",
+        "text": "货源",
+        "iconPath": "static/images/supply.png",
+        "selectedIconPath": "static/images/supply-active.png"
+      },
+      {
+        "pagePath": "pages/publish/index",
+        "text": "发布",
+        "iconPath": "static/images/publish.png",
+        "selectedIconPath": "static/images/publish-active.png"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "消息",
+        "iconPath": "static/images/message.png",
+        "selectedIconPath": "static/images/message-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/images/mine.png",
+        "selectedIconPath": "static/images/mine-active.png"
+      }
+    ]
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {}
+  }
+}
