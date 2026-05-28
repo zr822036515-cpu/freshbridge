@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # 鲜桥 FreshBridge 一键部署脚本
-# Usage: bash deploy.sh [--backend-only] [--frontend-only]
+# Usage: bash deploy.sh [--init-db] [--backend-only] [--frontend-only]
 
 DEPLOY_ROOT="/opt/freshbridge"
 BACKEND_DIR="${DEPLOY_ROOT}/backend"
@@ -16,10 +16,21 @@ NC='\033[0m'
 log() { echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $1"; }
 err() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
+INIT_DB=false
 BACKEND_ONLY=false
 FRONTEND_ONLY=false
+[[ "${1:-}" == "--init-db" ]] && INIT_DB=true
 [[ "${1:-}" == "--backend-only" ]] && BACKEND_ONLY=true
 [[ "${1:-}" == "--frontend-only" ]] && FRONTEND_ONLY=true
+
+# --- Init DB (first deploy only) ---
+if $INIT_DB; then
+    log "Initializing database..."
+    cd "$(dirname "$0")/.."
+    mysql -u root --default-character-set=utf8mb4 < migrations/001_init.sql || err "Schema init failed"
+    mysql -u root --default-character-set=utf8mb4 freshbridge < migrations/002_seed.sql || err "Seed data import failed"
+    log "Database initialized with seed data"
+fi
 
 # --- Backend ---
 if ! $FRONTEND_ONLY; then
