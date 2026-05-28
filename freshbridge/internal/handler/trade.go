@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -23,6 +24,9 @@ func (h *TradeHandler) Create(c *gin.Context) {
 	}
 	t.StallID = c.GetInt64("user_id")
 	t.Status = "pending"
+	if t.PricingMode == "" {
+		t.PricingMode = "fixed"
+	}
 	if err := h.repo.Create(&t); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,6 +63,12 @@ func (h *TradeHandler) RecordSale(c *gin.Context) {
 	}
 	sr.StallID = c.GetInt64("user_id")
 	sr.TotalAmount = sr.Quantity * sr.Price
+	if sr.RecordMethod == "" {
+		sr.RecordMethod = "manual"
+	}
+	if sr.SaleTime.IsZero() {
+		sr.SaleTime = time.Now()
+	}
 	if err := h.repo.CreateSale(&sr); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -66,22 +76,17 @@ func (h *TradeHandler) RecordSale(c *gin.Context) {
 	c.JSON(http.StatusCreated, sr)
 }
 
-// GET /api/trades/my — list my trades (farmer or stall)
+// GET /api/trades/my — list my trades (both farmer and stall roles)
 func (h *TradeHandler) ListMy(c *gin.Context) {
-	role := c.GetString("role")
 	userID := c.GetInt64("user_id")
-	var trades interface{}
-	var err error
-	if role == "farmer" {
-		trades, err = h.repo.FindByFarmer(userID)
-	} else {
-		trades, err = h.repo.FindByStall(userID)
+	// Query both sides — a user may be farmer on some trades and stall on others
+	farmerTrades, _ := h.repo.FindByFarmer(userID)
+	stallTrades, _ := h.repo.FindByStall(userID)
+	allTrades := append(farmerTrades, stallTrades...)
+	if allTrades == nil {
+		allTrades = []model.TradeOrder{}
 	}
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"trades": trades})
+	c.JSON(http.StatusOK, gin.H{"trades": allTrades})
 }
 
 // GET /api/trades/:id/sales — get sales records for a trade

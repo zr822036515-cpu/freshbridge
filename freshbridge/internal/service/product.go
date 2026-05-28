@@ -13,6 +13,21 @@ func NewProductService(repo *repository.ProductRepo) *ProductService {
 
 func (s *ProductService) Create(p *model.Product) error {
 	p.Status = "published"
+	if p.PricingMode == "" {
+		p.PricingMode = "fixed"
+	}
+	if p.CommissionRate == 0 {
+		p.CommissionRate = 25
+	}
+	if p.Packaging == "" {
+		p.Packaging = "纸箱"
+	}
+	if p.MinOrder == 0 {
+		p.MinOrder = 500
+	}
+	if p.Grade == "" {
+		p.Grade = "一级果"
+	}
 	return s.repo.Create(p)
 }
 
