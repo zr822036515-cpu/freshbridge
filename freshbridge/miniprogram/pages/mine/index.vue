@@ -4,16 +4,33 @@
     <view class="user-header">
       <view class="user-avatar touch-target" @tap="onLoginTap">
         <view v-if="userInfo" class="avatar-img">
-          <image :src="userInfo.avatar" mode="aspectFill" class="avatar-pic" />
+          <image :src="userInfo.avatar_url" mode="aspectFill" class="avatar-pic" />
         </view>
         <view v-else class="avatar-placeholder">
           <text>👤</text>
         </view>
       </view>
       <view class="user-info" @tap="onLoginTap">
-        <text v-if="userInfo" class="user-name">{{ userInfo.nickname }}</text>
-        <text v-else class="user-name">点击登录</text>
-        <text class="user-sub">{{ userInfo ? userInfo.phone || '已认证' : '登录后可发布货源' }}</text>
+        <view class="user-name-row">
+          <text v-if="userInfo" class="user-name">{{ userInfo.nickname || '鲜桥用户' }}</text>
+          <text v-else class="user-name">点击登录</text>
+          <view v-if="userInfo" class="role-badge" :class="'role-' + userInfo.role">
+            <text>{{ roleLabel(userInfo.role) }}</text>
+          </view>
+        </view>
+        <text class="user-sub">{{ loginSubtitle }}</text>
+      </view>
+    </view>
+
+    <!-- Verification & credit info (only when logged in) -->
+    <view v-if="userInfo" class="info-cards">
+      <view class="info-card" :class="userInfo.verified ? 'verified' : 'unverified'">
+        <text class="info-card-icon">{{ userInfo.verified ? '✅' : '⚠️' }}</text>
+        <text class="info-card-text">{{ userInfo.verified ? '已实名认证' : '未实名认证' }}</text>
+      </view>
+      <view class="info-card credit">
+        <text class="info-card-icon">⭐</text>
+        <text class="info-card-text">信用分 {{ userInfo.credit_score || 100 }}</text>
       </view>
     </view>
 
@@ -60,6 +77,12 @@
         <text class="nav-text">实名认证</text>
         <text class="nav-arrow">></text>
       </view>
+      <!-- Switch role placeholder -->
+      <view v-if="userInfo" class="nav-item card touch-target" @tap="onSwitchRole">
+        <text class="nav-icon">🔄</text>
+        <text class="nav-text">切换角色</text>
+        <text class="nav-arrow">></text>
+      </view>
     </view>
 
     <!-- Bottom actions -->
@@ -77,17 +100,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { getUserInfo, logout } from '../../utils/auth'
+import { ref, computed } from 'vue'
+import { login, getUserInfo, logout } from '../../utils/auth'
 
 const userInfo = ref(null)
 
 // Try to restore user info on load
 userInfo.value = getUserInfo()
 
+const loginSubtitle = computed(() => {
+  if (!userInfo.value) return '登录后可发布货源'
+  const parts = []
+  if (userInfo.value.phone) parts.push(userInfo.value.phone)
+  if (userInfo.value.origin_city) parts.push(userInfo.value.origin_city)
+  return parts.length ? parts.join(' · ') : '已登录'
+})
+
+function roleLabel(role) {
+  const map = { farmer: '农户', stall: '档口', driver: '司机' }
+  return map[role] || role
+}
+
 function onLoginTap() {
-  console.log('Navigate to login')
-  uni.showToast({ title: '登录功能开发中', icon: 'none' })
+  if (userInfo.value) return
+  login()
+    .then(u => {
+      userInfo.value = u
+      uni.showToast({ title: '登录成功', icon: 'success' })
+    })
+    .catch(err => {
+      console.error('Login failed:', err)
+      uni.showToast({ title: '登录失败，请重试', icon: 'none' })
+    })
+}
+
+function onSwitchRole() {
+  uni.showToast({ title: '切换角色功能开发中', icon: 'none' })
 }
 
 function onNavTap(label) {
@@ -144,12 +192,35 @@ function onLogout() {
   flex: 1;
 }
 
+.user-name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
 .user-name {
   font-size: 34rpx;
   font-weight: 600;
-  color: var(--white);
-  display: block;
-  margin-bottom: 8rpx;
+  color: #fff;
+}
+
+.role-badge {
+  margin-left: 12rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.role-badge.role-farmer {
+  background-color: #15803D;
+}
+.role-badge.role-stall {
+  background-color: #CA8A04;
+}
+.role-badge.role-driver {
+  background-color: #2563EB;
 }
 
 .user-sub {
@@ -157,10 +228,49 @@ function onLogout() {
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Info cards (verified + credit) */
+.info-cards {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.info-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  border-radius: 10px;
+  background-color: #fff;
+  min-height: 44px;
+}
+
+.info-card.verified {
+  border-left: 6rpx solid #15803D;
+}
+
+.info-card.unverified {
+  border-left: 6rpx solid #CA8A04;
+}
+
+.info-card.credit {
+  border-left: 6rpx solid #CA8A04;
+}
+
+.info-card-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.info-card-text {
+  font-size: 32rpx;
+  color: #14532D;
+}
+
 /* Stats row */
 .stats-row {
   display: flex;
-  background-color: var(--white);
+  background-color: #fff;
   border-radius: 10px;
   padding: 24rpx 0;
   margin-bottom: 24rpx;
@@ -176,7 +286,7 @@ function onLogout() {
 .stats-value {
   font-size: 32rpx;
   font-weight: 700;
-  color: var(--text);
+  color: #14532D;
   margin-bottom: 8rpx;
 }
 
@@ -205,7 +315,7 @@ function onLogout() {
 .nav-text {
   flex: 1;
   font-size: 32rpx;
-  color: var(--text);
+  color: #14532D;
 }
 
 .nav-arrow {
