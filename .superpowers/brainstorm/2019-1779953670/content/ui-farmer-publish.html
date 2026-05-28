@@ -1,0 +1,241 @@
+<h2>UI 设计 — 农户端 · 上架产品信息（货源发布）</h2>
+<p class="subtitle">全功能展示：语音录入 + 表单字段 + 图片上传 + 定价策略 | 适配大字/大触控</p>
+
+<div class="split">
+  <!-- 完整表单页 -->
+  <div class="mockup" style="flex:1.2;">
+    <div class="mockup-header" style="background:#15803D;color:white;">📦 发布货源 — 完整表单</div>
+    <div class="mockup-body" style="padding:0;font-size:14px;font-family:sans-serif;max-height:700px;overflow-y:auto;">
+      <!-- 顶部导航 -->
+      <div style="padding:10px 16px;background:#15803D;color:white;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;">
+        <span style="font-size:15px;">← 返回</span>
+        <span style="font-weight:600;font-size:16px;">发布货源</span>
+        <span style="font-size:13px;color:#FEF3C7;">💾 草稿</span>
+      </div>
+
+      <!-- 语音快捷入口 -->
+      <div style="margin:12px 16px;border:2px dashed #22C55E;border-radius:12px;padding:18px;text-align:center;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);cursor:pointer;min-height:44px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span style="font-size:28px;">🎤</span>
+          <div style="text-align:left;">
+            <div style="font-size:16px;font-weight:600;color:#15803D;">语音一键发布</div>
+            <div style="font-size:12px;color:#6B7280;">按住说话，AI自动填写下方表单</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== 基础信息 ====== -->
+      <div style="padding:0 16px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <div style="width:4px;height:16px;background:#15803D;border-radius:2px;"></div>
+          <span style="font-weight:600;font-size:15px;">基础信息</span>
+        </div>
+
+        <!-- 水果品种 - 级联选择 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:4px;">水果品种 <span style="color:#DC2626;">*</span></div>
+          <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:15px;min-height:44px;display:flex;justify-content:space-between;align-items:center;background:white;">
+            <span style="color:#9CA3AF;">请选择品种 → 具体品种</span><span style="color:#9CA3AF;">▼</span>
+          </div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">例：苹果 → 红富士 | 柑橘 → 赣南脐橙</div>
+        </div>
+
+        <!-- 规格 和 等级 并排 -->
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">果径规格 <span style="color:#DC2626;">*</span></div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:15px;min-height:44px;display:flex;justify-content:space-between;align-items:center;background:white;">
+              <span style="color:#9CA3AF;">选择规格</span><span>▼</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">品质等级</div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:15px;min-height:44px;display:flex;justify-content:space-between;align-items:center;background:white;">
+              <span style="color:#9CA3AF;">选择等级</span><span>▼</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 产量 和 价格 并排 -->
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">预估产量 <span style="color:#DC2626;">*</span></div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:16px;min-height:44px;display:flex;align-items:center;gap:6px;background:white;">
+              <input placeholder="5000" style="border:none;outline:none;font-size:16px;width:65px;font-weight:600;background:transparent;">
+              <span style="color:#6B7280;">斤</span>
+              <span style="margin-left:auto;font-size:12px;color:#CA8A04;">≈ 2.5吨</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">预期价格 <span style="color:#DC2626;">*</span></div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:16px;min-height:44px;display:flex;align-items:center;gap:6px;background:white;">
+              <input placeholder="3.5" style="border:none;outline:none;font-size:16px;width:50px;font-weight:600;background:transparent;">
+              <span style="color:#6B7280;">元/斤</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 上市时间 和 产地 并排 -->
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">上市时间 <span style="color:#DC2626;">*</span></div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:15px;min-height:44px;display:flex;justify-content:space-between;align-items:center;background:white;">
+              <span style="color:#9CA3AF;">选择日期</span><span>📅</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">产地</div>
+            <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:14px;min-height:44px;display:flex;align-items:center;gap:4px;background:#F9FAFB;">
+              📍 陕西·洛川 <span style="color:#22C55E;font-size:11px;">自动</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 包装方式 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:4px;">包装方式</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="padding:8px 14px;border:1px solid #22C55E;background:#F0FDF4;color:#15803D;border-radius:20px;font-size:14px;min-height:36px;">纸箱</span>
+            <span style="padding:8px 14px;border:1px solid #D1D5DB;background:white;color:#6B7280;border-radius:20px;font-size:14px;min-height:36px;">泡沫箱</span>
+            <span style="padding:8px 14px;border:1px solid #D1D5DB;background:white;color:#6B7280;border-radius:20px;font-size:14px;min-height:36px;">塑料筐</span>
+            <span style="padding:8px 14px;border:1px solid #D1D5DB;background:white;color:#6B7280;border-radius:20px;font-size:14px;min-height:36px;">散装</span>
+          </div>
+        </div>
+
+        <!-- 最小起订量 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:4px;">最小起订量</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="padding:8px 14px;border:1px solid #22C55E;background:#F0FDF4;color:#15803D;border-radius:20px;font-size:14px;min-height:36px;">500斤</span>
+            <span style="padding:8px 14px;border:1px solid #D1D5DB;background:white;color:#6B7280;border-radius:20px;font-size:14px;min-height:36px;">1000斤</span>
+            <span style="padding:8px 14px;border:1px solid #D1D5DB;background:white;color:#6B7280;border-radius:20px;font-size:14px;min-height:36px;">不限</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== 图片上传 ====== -->
+      <div style="padding:0 16px;margin-top:4px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <div style="width:4px;height:16px;background:#15803D;border-radius:2px;"></div>
+          <span style="font-weight:600;font-size:15px;">果园实拍</span>
+          <span style="font-size:11px;color:#9CA3AF;">（至少1张，最多9张）</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="width:80px;height:80px;border:2px dashed #22C55E;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F0FDF4;min-width:80px;min-height:80px;">
+            <span style="font-size:28px;color:#15803D;">📷</span>
+            <span style="font-size:11px;color:#15803D;font-weight:500;">拍照</span>
+          </div>
+          <div style="width:80px;height:80px;border:2px dashed #D1D5DB;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:80px;min-height:80px;">
+            <span style="font-size:28px;color:#9CA3AF;">🖼</span>
+            <span style="font-size:11px;color:#9CA3AF;">相册</span>
+          </div>
+          <!-- 已上传预览 -->
+          <div style="width:80px;height:80px;border-radius:10px;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:11px;color:#9CA3AF;position:relative;min-width:80px;min-height:80px;">
+            照片1
+            <span style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:#DC2626;color:white;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;">✕</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== 定价策略 ====== -->
+      <div style="padding:0 16px;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <div style="width:4px;height:16px;background:#CA8A04;border-radius:2px;"></div>
+          <span style="font-weight:600;font-size:15px;">定价与交易</span>
+        </div>
+        <!-- 价格模式 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:6px;">定价模式</div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;padding:12px;border:2px solid #22C55E;border-radius:10px;background:#F0FDF4;text-align:center;min-height:44px;">
+              <div style="font-size:14px;font-weight:600;color:#15803D;">一口价</div>
+              <div style="font-size:11px;color:#6B7280;">按设定价格销售</div>
+            </div>
+            <div style="flex:1;padding:12px;border:1px solid #E5E7EB;border-radius:10px;text-align:center;min-height:44px;">
+              <div style="font-size:14px;font-weight:500;color:#6B7280;">保底+分成</div>
+              <div style="font-size:11px;color:#9CA3AF;">保底价 + 超出部分分成</div>
+            </div>
+          </div>
+        </div>
+        <!-- 代卖佣金 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:4px;">接受代卖佣金</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="padding:8px 12px;border:1px solid #D1D5DB;background:white;border-radius:20px;font-size:13px;min-height:36px;">20%</span>
+            <span style="padding:8px 12px;border:1px solid #22C55E;background:#F0FDF4;color:#15803D;border-radius:20px;font-size:13px;min-height:36px;">25%（推荐）</span>
+            <span style="padding:8px 12px;border:1px solid #D1D5DB;background:white;border-radius:20px;font-size:13px;min-height:36px;">30%</span>
+          </div>
+        </div>
+        <!-- 备注 -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:14px;color:#374151;margin-bottom:4px;">补充说明</div>
+          <textarea placeholder="可补充：果园位置详情、是否有冷库、是否可分批发货、特殊品质说明等..." style="width:100%;padding:10px;border:1px solid #D1D5DB;border-radius:8px;font-size:14px;min-height:60px;resize:none;font-family:sans-serif;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+      <!-- 急售和发布 -->
+      <div style="padding:12px 16px;border-top:1px solid #F3F4F6;background:white;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:14px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#CA8A04;">⚡</span>
+            <span>标记为急售</span>
+            <span style="font-size:11px;color:#9CA3AF;">优先推荐给档口</span>
+          </div>
+          <div style="width:48px;height:26px;background:#D1D5DB;border-radius:13px;display:flex;align-items:center;padding:2px;">
+            <div style="width:22px;height:22px;background:white;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button style="flex:1;padding:14px;border:1px solid #D1D5DB;border-radius:10px;font-size:16px;font-weight:500;background:white;min-height:48px;">💾 保存草稿</button>
+          <button style="flex:2;padding:14px;background:#15803D;color:white;border:none;border-radius:10px;font-size:18px;font-weight:600;min-height:48px;">✓ 立即发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧：解释说明 -->
+  <div class="mockup" style="flex:0.8;">
+    <div class="mockup-header">设计说明 & 交互细节</div>
+    <div class="mockup-body" style="padding:16px;font-size:13px;font-family:sans-serif;">
+
+      <h3 style="font-size:14px;margin-top:0;">🎤 语音录入</h3>
+      <ul style="margin:4px 0 12px;padding-left:16px;line-height:1.8;">
+        <li>页面顶部固定语音入口，点击后弹出录音界面</li>
+        <li>ASR识别后自动填充：品种、产量、价格、时间</li>
+        <li>未识别到的字段高亮提示用户手动补充</li>
+        <li>支持方言优化（关中话、赣南话等）</li>
+      </ul>
+
+      <h3 style="font-size:14px;">📋 表单优化</h3>
+      <ul style="margin:4px 0 12px;padding-left:16px;line-height:1.8;">
+        <li>品种/规格/等级全部用<strong>级联选择</strong>，不自由输入</li>
+        <li>产量输入旁显示<strong>自动换算吨数</strong></li>
+        <li>产地 LBS <strong>自动定位</strong>，减少手动输入</li>
+        <li>包装/佣金等用<strong>标签点选</strong>代替下拉框</li>
+      </ul>
+
+      <h3 style="font-size:14px;">♿ 适老化设计</h3>
+      <ul style="margin:4px 0 12px;padding-left:16px;line-height:1.8;">
+        <li>全页面字号 ≥ 14px，输入框字号 16px</li>
+        <li>所有可点击元素 ≥ 44px 高度</li>
+        <li>标签点选比下拉框更易操作</li>
+        <li>必要字段标红色*号，非必要字段弱化</li>
+      </ul>
+
+      <h3 style="font-size:14px;">📡 离线兼容</h3>
+      <ul style="margin:4px 0 12px;padding-left:16px;line-height:1.8;">
+        <li>表单填写内容本地实时缓存（草稿）</li>
+        <li>图片先本地压缩，联网后上传OSS</li>
+        <li>发布时若无网络，存入待发队列，联网后自动发送</li>
+      </ul>
+
+      <h3 style="font-size:14px;">🔔 发布后</h3>
+      <ul style="margin:4px 0;padding-left:16px;line-height:1.8;">
+        <li>发布成功 → 跳转「我的货源」列表页</li>
+        <li>系统自动推荐匹配的档口</li>
+        <li>有档口接单时 → 微信服务通知 + 短信双通道</li>
+        <li>可随时编辑未接单的货源信息</li>
+      </ul>
+    </div>
+  </div>
+</div>

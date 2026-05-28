@@ -1,0 +1,136 @@
+<h2>UI 设计 — 档口快速记账 & 司机端</h2>
+<p class="subtitle">语音/扫码/OCR三种录入 | 运单列表 | 在途追踪</p>
+
+<div class="split">
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header" style="background:#CA8A04;color:white;">档口端 — 快速记账</div>
+    <div class="mockup-body" style="padding:0;font-size:14px;font-family:sans-serif;">
+      <div style="padding:8px 16px;background:#CA8A04;color:white;display:flex;align-items:center;justify-content:space-between;">
+        <span>←</span>
+        <span style="font-weight:600;">快速记账</span>
+        <span style="font-size:12px;">🍎 红富士苹果</span>
+      </div>
+      <!-- 语音录入大按钮 -->
+      <div style="margin:14px 16px;border:2px dashed #CA8A04;border-radius:14px;padding:22px;text-align:center;background:#FFF7ED;min-height:44px;">
+        <div style="font-size:32px;">🎤</div>
+        <div style="font-size:16px;font-weight:600;color:#CA8A04;margin-top:4px;">长按语音记账</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:4px;">"红富士卖了300斤，3块5一斤"</div>
+        <div style="margin-top:8px;padding:6px 12px;background:white;border-radius:6px;font-size:12px;color:#374151;">
+          刚刚：识别到 → 品种:红富士 | 数量:300斤 | 单价:¥3.5 ✓
+        </div>
+      </div>
+      <!-- 手动录入 -->
+      <div style="padding:0 16px;">
+        <div style="font-size:13px;color:#9CA3AF;text-align:center;margin-bottom:12px;">——— 或手动录入 ———</div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:13px;color:#6B7280;margin-bottom:4px;">选择水果</div>
+          <div style="border:1px solid #D1D5DB;border-radius:8px;padding:12px;font-size:15px;min-height:44px;display:flex;justify-content:space-between;align-items:center;background:white;">
+            <span style="font-weight:500;">🍎 红富士苹果 80-85mm</span><span style="color:#9CA3AF;">▼</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;color:#6B7280;margin-bottom:4px;">售出数量 *</div>
+            <div style="display:flex;align-items:center;gap:4px;border:1px solid #D1D5DB;border-radius:8px;padding:0 12px;background:white;min-height:44px;">
+              <input placeholder="300" style="border:none;outline:none;font-size:16px;width:60px;background:transparent;font-weight:600;">
+              <span style="font-size:14px;color:#6B7280;">斤</span>
+              <div style="margin-left:auto;display:flex;flex-direction:column;">
+                <button style="border:none;background:none;font-size:14px;color:#15803D;padding:2px 4px;min-height:20px;">▲</button>
+                <button style="border:none;background:none;font-size:14px;color:#15803D;padding:2px 4px;min-height:20px;">▼</button>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;color:#6B7280;margin-bottom:4px;">单价 *</div>
+            <div style="display:flex;align-items:center;gap:4px;border:1px solid #D1D5DB;border-radius:8px;padding:0 12px;background:white;min-height:44px;">
+              <input placeholder="3.5" style="border:none;outline:none;font-size:16px;width:50px;background:transparent;font-weight:600;">
+              <span style="font-size:14px;color:#6B7280;">元/斤</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:#F0FDF4;border-radius:8px;padding:12px;text-align:right;margin-bottom:10px;">
+          <span style="font-size:13px;color:#6B7280;">小计：</span>
+          <span style="font-size:22px;font-weight:700;color:#15803D;">¥1,050</span>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <button style="flex:1;padding:12px;border:1px solid #D1D5DB;border-radius:8px;background:white;font-size:14px;min-height:44px;">📷 拍照记账</button>
+          <button style="flex:1;padding:12px;border:1px solid #D1D5DB;border-radius:8px;background:white;font-size:14px;min-height:44px;">📄 扫描单据</button>
+        </div>
+        <button style="width:100%;padding:14px;background:#CA8A04;color:white;border:none;border-radius:10px;font-size:18px;font-weight:600;min-height:48px;margin-bottom:10px;">✓ 确认记账</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header" style="background:#7C3AED;color:white;">司机端</div>
+    <div class="mockup-body" style="padding:0;font-size:14px;font-family:sans-serif;">
+      <!-- 运单列表 -->
+      <div style="padding:8px 16px;background:#7C3AED;color:white;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-weight:600;">运单</span>
+        <span style="font-size:12px;opacity:0.8;">附近 5单</span>
+      </div>
+      <!-- 状态切换 -->
+      <div style="padding:10px 16px;display:flex;gap:8px;background:white;border-bottom:1px solid #F3F4F6;">
+        <span style="padding:6px 16px;background:#7C3AED;color:white;border-radius:20px;font-size:13px;font-weight:500;min-height:32px;">待接单(3)</span>
+        <span style="padding:6px 16px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:13px;min-height:32px;">进行中(1)</span>
+        <span style="padding:6px 16px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:13px;min-height:32px;">已完成</span>
+      </div>
+      <!-- 运单卡片 -->
+      <div style="padding:12px 16px;">
+        <div style="border:1px solid #E5E7EB;border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid #7C3AED;">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div style="font-weight:600;font-size:15px;">陕西洛川 → 广州江南市场</div>
+            <span style="background:#F3F4F6;padding:3px 8px;border-radius:6px;font-size:11px;color:#6B7280;">回程车</span>
+          </div>
+          <div style="font-size:13px;color:#6B7280;margin-top:4px;">🍎 苹果 5吨 | 4.2米厢货 | 5月28日装车</div>
+          <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:#9CA3AF;">
+            <span>📍 1,650km</span><span>⏱ 约22小时</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <span style="font-size:18px;font-weight:700;color:#7C3AED;">¥3,200</span>
+            <button style="padding:8px 20px;background:#7C3AED;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;min-height:36px;">接单</button>
+          </div>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div style="font-weight:600;font-size:15px;">江西赣州 → 上海江桥市场</div>
+            <span style="background:#FEF3C7;color:#CA8A04;padding:3px 8px;border-radius:6px;font-size:11px;">急</span>
+          </div>
+          <div style="font-size:13px;color:#6B7280;margin-top:4px;">🍊 脐橙 3吨 | 6.8米 | 5月29日装车</div>
+          <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:#9CA3AF;">
+            <span>📍 1,200km</span><span>⏱ 约16小时</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <span style="font-size:18px;font-weight:700;color:#7C3AED;">¥2,800</span>
+            <button style="padding:8px 20px;background:#7C3AED;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;min-height:36px;">接单</button>
+          </div>
+        </div>
+      </div>
+      <!-- 在途追踪（下半部分） -->
+      <div style="border-top:2px solid #F3F4F6;padding:10px 16px;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px;">进行中 — 在途追踪</div>
+        <div style="background:#F9FAFB;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:500;">📍 陕西洛川 → 广州江南</span>
+            <span style="font-size:12px;color:#22C55E;">● 在途中</span>
+          </div>
+          <!-- 进度条 -->
+          <div style="background:#E5E7EB;border-radius:4px;height:6px;overflow:hidden;margin-bottom:8px;">
+            <div style="width:65%;height:100%;background:#7C3AED;border-radius:4px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B7280;">
+            <span>已行驶 1,070km</span><span>剩余 580km</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#6B7280;">
+            <span>预计 23:30 到达</span><span>⏱ 约7.5小时</span>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;">
+            <button style="flex:1;padding:8px;background:white;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;min-height:40px;">📞 联系货主</button>
+            <button style="flex:1;padding:8px;background:white;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;min-height:40px;">📞 联系收货方</button>
+            <button style="flex:1;padding:8px;background:#DC2626;color:white;border:none;border-radius:6px;font-size:12px;min-height:40px;">⚠ 报异常</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

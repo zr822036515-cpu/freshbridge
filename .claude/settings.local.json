@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python search.py \"dashboard real-time monitoring data overview\" --domain chart)"
+    ]
+  }
+}

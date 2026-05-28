@@ -1,0 +1,142 @@
+<h2>UI 设计 — 农户端（续）& 档口端</h2>
+<p class="subtitle">销售看板 | 对账单 | 货源浏览 | 快速记账</p>
+
+<div class="split">
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header" style="background:#15803D;color:white;">销售实时看板</div>
+    <div class="mockup-body" style="padding:0;font-size:14px;font-family:sans-serif;">
+      <div style="padding:8px 16px;background:#15803D;color:white;display:flex;align-items:center;justify-content:space-between;">
+        <span>←</span>
+        <span style="font-weight:600;">销售看板</span>
+        <span style="font-size:12px;">🔄 10秒刷新</span>
+      </div>
+      <!-- 大数字概览 -->
+      <div style="padding:14px 16px;background:white;display:flex;justify-content:space-around;border-bottom:1px solid #F3F4F6;">
+        <div style="text-align:center;">
+          <div style="font-size:12px;color:#6B7280;">今日销售额</div>
+          <div style="font-size:24px;font-weight:700;color:#15803D;">¥1,120</div>
+          <div style="font-size:11px;color:#22C55E;">↑ 12%</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:12px;color:#6B7280;">今日销量</div>
+          <div style="font-size:24px;font-weight:700;">320斤</div>
+          <div style="font-size:11px;color:#22C55E;">18笔</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:12px;color:#6B7280;">剩余库存</div>
+          <div style="font-size:24px;font-weight:700;">3,100斤</div>
+          <div style="font-size:11px;color:#DC2626;">损耗 50斤</div>
+        </div>
+      </div>
+      <!-- 趋势图 -->
+      <div style="padding:12px 16px;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:6px;">近7天销售趋势</div>
+        <div style="background:#F9FAFB;border-radius:8px;height:80px;display:flex;align-items:end;gap:12px;padding:12px 8px 4px;">
+          <div style="flex:1;height:40%;background:#86EFAC;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:55%;background:#86EFAC;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:70%;background:#4ADE80;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:60%;background:#86EFAC;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:85%;background:#22C55E;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:90%;background:#22C55E;border-radius:4px 4px 0 0;min-width:12px;"></div>
+          <div style="flex:1;height:78%;background:#22C55E;border-radius:4px 4px 0 0;min-width:12px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#9CA3AF;padding:4px 8px 0;">
+          <span>21日</span><span>22日</span><span>23日</span><span>24日</span><span>25日</span><span>26日</span><span>27日</span>
+        </div>
+      </div>
+      <!-- 实时流水 -->
+      <div style="padding:0 16px;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px;">实时销售流水</div>
+        <div style="border-left:3px solid #22C55E;padding-left:10px;">
+          <div style="margin-bottom:8px;font-size:13px;">
+            <span style="color:#9CA3AF;">10:32</span> 售出 <b>50斤</b> ¥3.5/斤
+            <span style="color:#22C55E;">¥175</span>
+          </div>
+          <div style="margin-bottom:8px;font-size:13px;">
+            <span style="color:#9CA3AF;">10:15</span> 售出 <b>80斤</b> ¥3.6/斤
+            <span style="color:#22C55E;">¥288</span>
+          </div>
+          <div style="margin-bottom:8px;font-size:13px;">
+            <span style="color:#9CA3AF;">09:48</span> 售出 <b>100斤</b> ¥3.4/斤
+            <span style="color:#22C55E;">¥340</span>
+          </div>
+        </div>
+      </div>
+      <!-- 结算预估 -->
+      <div style="margin:12px 16px;padding:12px;background:#F0FDF4;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:14px;font-weight:600;">预估结算</span>
+          <span style="font-size:20px;font-weight:700;color:#15803D;">¥6,475</span>
+        </div>
+        <div style="font-size:11px;color:#6B7280;margin-top:2px;">已售1850斤 ÷ 佣金25%+服务费2%+物流3%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header" style="background:#CA8A04;color:white;">档口端 — 货源浏览</div>
+    <div class="mockup-body" style="padding:0;font-size:14px;font-family:sans-serif;">
+      <!-- 搜索栏 -->
+      <div style="padding:10px 16px;background:white;border-bottom:1px solid #F3F4F6;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="flex:1;background:#F3F4F6;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:6px;min-height:44px;">
+            <span style="color:#9CA3AF;">🔍</span>
+            <span style="color:#9CA3AF;font-size:14px;">搜索品种、产地...</span>
+          </div>
+          <div style="width:44px;height:44px;background:#F3F4F6;border-radius:8px;display:flex;align-items:center;justify-content:center;">🔔</div>
+        </div>
+      </div>
+      <!-- 品类快捷入口 -->
+      <div style="padding:12px 16px;">
+        <div style="display:flex;gap:10px;overflow-x:auto;">
+          <div style="text-align:center;min-width:56px;">
+            <div style="width:48px;height:48px;background:#F0FDF4;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;">🍎</div>
+            <div style="font-size:12px;margin-top:4px;font-weight:500;">苹果</div>
+          </div>
+          <div style="text-align:center;min-width:56px;">
+            <div style="width:48px;height:48px;background:#FFF7ED;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;">🍊</div>
+            <div style="font-size:12px;margin-top:4px;font-weight:500;">柑橘</div>
+          </div>
+          <div style="text-align:center;min-width:56px;">
+            <div style="width:48px;height:48px;background:#FEFCE8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;">🥭</div>
+            <div style="font-size:12px;margin-top:4px;font-weight:500;">芒果</div>
+          </div>
+          <div style="text-align:center;min-width:56px;">
+            <div style="width:48px;height:48px;background:#FEF2F2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;">🍒</div>
+            <div style="font-size:12px;margin-top:4px;font-weight:500;">樱桃</div>
+          </div>
+        </div>
+      </div>
+      <!-- 推荐货源 -->
+      <div style="padding:0 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-weight:600;font-size:15px;">推荐货源</span>
+          <span style="font-size:12px;color:#6B7280;">为你优选 →</span>
+        </div>
+        <!-- 货源卡片 -->
+        <div style="border:1px solid #E5E7EB;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div style="font-size:15px;font-weight:600;">🍎 红富士苹果 80-85mm</div>
+            <span style="background:#FEF3C7;color:#CA8A04;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">急售</span>
+          </div>
+          <div style="font-size:13px;color:#6B7280;margin-top:4px;">陕西·洛川 | 5000斤 | ¥3.5/斤</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <span style="font-size:12px;color:#9CA3AF;">5月28日 可发货</span>
+            <button style="padding:8px 20px;background:#15803D;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;min-height:36px;">接单</button>
+          </div>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div style="font-size:15px;font-weight:600;">🍊 赣南脐橙 70mm+</div>
+            <span style="background:#E5E7EB;color:#6B7280;padding:3px 8px;border-radius:6px;font-size:11px;">新上</span>
+          </div>
+          <div style="font-size:13px;color:#6B7280;margin-top:4px;">江西·赣州 | 3000斤 | ¥2.8/斤</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <span style="font-size:12px;color:#9CA3AF;">5月30日 可发货</span>
+            <button style="padding:8px 20px;background:#15803D;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;min-height:36px;">接单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
