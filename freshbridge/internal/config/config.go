@@ -12,6 +12,16 @@ type Config struct {
 	JWTSecret string
 	GinMode   string
 
+	// WeChat
+	WechatAppID     string
+	WechatAppSecret string
+
+	// Admin
+	AdminToken string
+
+	// JWT
+	JWTExpiryHours int
+
 	// DB Pool
 	DBMaxOpenConns    int
 	DBMaxIdleConns    int
@@ -25,6 +35,10 @@ func Load() *Config {
 		RedisAddr:         getEnv("REDIS_ADDR", "localhost:6379"),
 		JWTSecret:         getEnv("JWT_SECRET", "freshbridge-secret-key-change-in-production"),
 		GinMode:           getEnv("GIN_MODE", "release"),
+		WechatAppID:       getEnv("WECHAT_APP_ID", ""),
+		WechatAppSecret:   getEnv("WECHAT_APP_SECRET", ""),
+		AdminToken:         getEnv("ADMIN_TOKEN", "freshbridge-admin-2024"),
+			JWTExpiryHours:     getEnvInt("JWT_EXPIRY_HOURS", 72),
 		DBMaxOpenConns:    getEnvInt("DB_MAX_OPEN_CONNS", 25),
 		DBMaxIdleConns:    getEnvInt("DB_MAX_IDLE_CONNS", 10),
 		DBConnMaxLifetime: getEnvInt("DB_CONN_MAX_LIFETIME", 300),

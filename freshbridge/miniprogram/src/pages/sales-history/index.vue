@@ -52,7 +52,7 @@
             <view class="sale-time-badge">
               <text class="sale-time">{{ formatTime(sale.sale_time) }}</text>
             </view>
-            <text class="sale-method">{{ methodIcon(sale.record_method) }}</text>
+            <image :src="methodIcon(sale.record_method)" mode="aspectFit" class="sale-method-img" />
           </view>
           <view class="sale-body">
             <text class="sale-variety">
@@ -71,7 +71,7 @@
 
       <!-- Empty state -->
       <view v-if="sales.length === 0" class="empty-state">
-        <text class="empty-icon">📋</text>
+        <image src="/static/images/clipboard.svg" mode="aspectFit" class="empty-icon-img" />
         <text class="empty-text">暂无销售记录</text>
         <text class="empty-sub">去快速记账，记录销售数据</text>
       </view>
@@ -204,8 +204,8 @@ function formatTime(dateStr) {
 }
 
 function methodIcon(method) {
-  const map = { scan: '📷', manual: '✍️' }
-  return map[method] || '✍️'
+  const map = { scan: '/static/images/camera.svg', manual: '/static/images/edit.svg' }
+  return map[method] || '/static/images/edit.svg'
 }
 </script>
 

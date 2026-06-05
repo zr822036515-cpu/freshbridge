@@ -15,7 +15,7 @@
         :class="{ active: activeTab === tab.key }"
         @tap="activeTab = tab.key"
       >
-        <text class="tab-icon">{{ tab.icon }}</text>
+        <image :src="tab.icon" mode="aspectFit" class="tab-icon-img" />
         <text>{{ tab.label }}</text>
       </view>
     </view>
@@ -23,7 +23,7 @@
     <!-- Tab content: 扫码记账 -->
     <view v-if="activeTab === 'scan'" class="tab-content">
       <view class="scan-area touch-target" @tap="onScanCode">
-        <text class="scan-icon">📷</text>
+        <image src="/static/images/camera.svg" mode="aspectFit" class="scan-icon-img" />
         <text class="scan-text">点击扫码</text>
       </view>
       <view v-if="scanResult" class="scan-result card">
@@ -107,8 +107,8 @@ import { get, post } from '../../utils/api'
 
 const activeTab = ref('manual')
 const tabs = ref([
-  { key: 'scan', label: '扫码记账', icon: '📷' },
-  { key: 'manual', label: '手写录入', icon: '✍️' }
+  { key: 'scan', label: '扫码记账', icon: '/static/images/camera.svg' },
+  { key: 'manual', label: '手写录入', icon: '/static/images/edit.svg' }
 ])
 
 const trades = ref([])
@@ -260,8 +260,9 @@ function onScanCode() {
     color: var(--white);
   }
 
-  .tab-icon {
-    font-size: 36rpx;
+  .tab-icon-img {
+    width: 40rpx;
+    height: 40rpx;
   }
 }
 
@@ -287,8 +288,9 @@ function onScanCode() {
   min-height: 44px;
   gap: 16rpx;
 
-  .scan-icon {
-    font-size: 64rpx;
+  .scan-icon-img {
+    width: 80rpx;
+    height: 80rpx;
   }
 
   .scan-text {

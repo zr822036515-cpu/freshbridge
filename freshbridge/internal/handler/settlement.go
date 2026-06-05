@@ -196,3 +196,26 @@ func (h *MarketHandler) GetByDate(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"prices": items})
 }
+
+func (h *MarketHandler) GetSummary(c *gin.Context) {
+	summary, err := h.repo.GetSummary()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"summary": summary})
+}
+
+func (h *MarketHandler) GetTrend(c *gin.Context) {
+	variety := c.Query("variety")
+	if variety == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "variety is required"})
+		return
+	}
+	points, err := h.repo.GetTrend(variety)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"variety": variety, "points": points})
+}

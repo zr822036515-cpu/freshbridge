@@ -24,16 +24,18 @@ func (r *ProductRepo) FindByFarmer(farmerID int64) ([]model.Product, error) {
 	return products, err
 }
 
-func (r *ProductRepo) Search(category, keyword string, limit, offset int) ([]model.Product, int64, error) {
+func (r *ProductRepo) Search(category, keyword, variety string, limit, offset int) ([]model.Product, int64, error) {
 	var products []model.Product
 	var total int64
 	q := r.db.Model(&model.Product{}).Where("status IN ?", []string{"published", "trading"})
 	if category != "" {
 		q = q.Where("category = ?", category)
 	}
-	if keyword != "" {
+	if variety != "" {
+		q = q.Where("variety = ?", variety)
+	} else if keyword != "" {
 		like := "%" + keyword + "%"
-		q = q.Where("variety LIKE ? OR origin_city LIKE ?", like, like)
+		q = q.Where("variety LIKE ? OR origin_city LIKE ? OR category LIKE ?", like, like, like)
 	}
 	q.Count(&total)
 	err := q.Order("urgent DESC, created_at DESC").Limit(limit).Offset(offset).Find(&products).Error

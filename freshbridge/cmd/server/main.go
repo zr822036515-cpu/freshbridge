@@ -48,10 +48,14 @@ func main() {
 	settlementRepo := repository.NewSettlementRepo(db)
 	logisticsRepo := repository.NewLogisticsRepo(db)
 	marketPriceRepo := repository.NewMarketPriceRepo(db)
+	mallRepo := repository.NewMallRepo(db)
+	adminRepo := repository.NewAdminRepo(db)
+	gapsRepo := repository.NewGapsRepo(db)
 
 	// Init services
 	authSvc := service.NewAuthService(cfg, userRepo)
 	productSvc := service.NewProductService(productRepo)
+	marketUpdater := service.NewMarketUpdater(db, 6*time.Hour)
 
 	// Init handlers
 	authH := handler.NewAuthHandler(authSvc)
@@ -60,32 +64,53 @@ func main() {
 	settlementH := handler.NewSettlementHandler(settlementRepo)
 	logisticsH := handler.NewLogisticsHandler(logisticsRepo)
 	marketH := handler.NewMarketHandler(marketPriceRepo)
+	mallH := handler.NewMallHandler(mallRepo)
+	adminH := handler.NewAdminHandler(adminRepo, marketUpdater)
+	gapsH := handler.NewGapsHandler(gapsRepo)
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
-	r.Use(middleware.RateLimit(100, time.Minute))
 	r.Use(middleware.MaxBodySize(1 << 20)) // 1MB
 
-	// Health with DB check
-	r.GET("/api/health", func(c *gin.Context) {
+	// API group with rate limiting
+	api := r.Group("/api")
+	api.Use(middleware.RateLimit(200, time.Minute))
+
+	// Public API routes (no auth)
+	api.GET("/health", func(c *gin.Context) {
 		if err := sqlDB.Ping(); err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy", "db": "disconnected"})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+	api.POST("/auth/wechat-login", authH.WechatLogin)
+	api.GET("/market/prices", marketH.GetLatest)
+	api.GET("/market/prices/date", marketH.GetByDate)
+	api.GET("/market/summary", marketH.GetSummary)
+	api.GET("/market/trend", marketH.GetTrend)
 
-	// Auth (no token required)
-	r.POST("/api/auth/wechat-login", authH.WechatLogin)
+	// Public info pages
+	api.GET("/finance/summary", handler.FinanceSummary)
+	api.GET("/supply-demand/list", gapsH.ListSupplyDemand)
+	api.GET("/i18n/:locale", handler.I18nMessages)
+	api.GET("/procurements", gapsH.ListProcurements)
 
-	// Protected routes
-	auth := r.Group("/api")
+	// Public mall (browse products)
+	api.GET("/mall/products", mallH.ListProducts)
+	api.GET("/mall/products/:id", mallH.GetProduct)
+
+	// Protected routes (auth required)
+	auth := api.Group("")
 	auth.Use(middleware.AuthRequired(cfg.JWTSecret))
 	{
 		auth.GET("/user/profile", authH.Profile)
 		auth.POST("/products", productH.Create)
+		auth.POST("/procurements", gapsH.CreateProcurement)
+		auth.GET("/procurements/my", gapsH.ListMyProcurements)
 		auth.GET("/products", productH.Search)
 		auth.GET("/products/my", productH.ListMy)
 		auth.GET("/products/:id", productH.GetByID)
@@ -103,11 +128,51 @@ func main() {
 		auth.GET("/logistics/:id", logisticsH.GetByID)
 		auth.PUT("/logistics/:id/gps", logisticsH.UpdateGPS)
 		auth.PUT("/logistics/:id/arrive", logisticsH.Arrive)
+
+			// Transport
+			auth.GET("/transport/dashboard", handler.DriverDashboard)
+			auth.GET("/transport/timeline/:id", gapsH.GetTimeline)
+
+			// Notifications
+			auth.GET("/notifications", gapsH.ListNotifications)
+			auth.PUT("/notifications/:id/read", gapsH.MarkNotificationRead)
+
+			// Mall
+			auth.GET("/mall/cart", mallH.ListCart)
+			auth.GET("/mall/cart/count", mallH.CartCount)
+			auth.POST("/mall/cart", mallH.AddToCart)
+			auth.PUT("/mall/cart/:id", mallH.UpdateCartItem)
+			auth.DELETE("/mall/cart/:id", mallH.RemoveCartItem)
+			auth.POST("/mall/orders", mallH.CreateOrder)
+			auth.GET("/mall/orders", mallH.ListOrders)
+			auth.GET("/mall/orders/:id", mallH.GetOrder)
+			auth.PUT("/mall/orders/:id/cancel", mallH.CancelOrder)
 	}
 
-	// Market data (no auth required)
-	r.GET("/api/market/prices", marketH.GetLatest)
-	r.GET("/api/market/prices/date", marketH.GetByDate)
+	// Admin API (token auth) — mounted at /admin-api to avoid conflict with /admin static files
+	adminAPI := r.Group("/admin-api")
+	adminAPI.Use(middleware.AdminAuth(cfg.AdminToken))
+	adminAPI.Use(middleware.AdminAudit(gapsRepo))
+	{
+		adminAPI.GET("/dashboard", adminH.Dashboard)
+		adminAPI.GET("/users", adminH.ListUsers)
+		adminAPI.PUT("/users/:id", adminH.UpdateUser)
+		adminAPI.GET("/orders", adminH.ListOrders)
+		adminAPI.PUT("/orders/:id", adminH.UpdateOrder)
+		adminAPI.GET("/products", adminH.ListProducts)
+		adminAPI.POST("/products", adminH.CreateProduct)
+		adminAPI.PUT("/products/:id", adminH.UpdateProduct)
+		adminAPI.PUT("/products/:id/status", adminH.UpdateProductStatus)
+		adminAPI.GET("/procurements", gapsH.AdminListProcurements)
+		adminAPI.POST("/update-prices", adminH.TriggerPriceUpdate)
+		adminAPI.GET("/audit-logs", gapsH.ListAuditLogs)
+	}
+
+	// Start market price updater (runs every 6h)
+	marketUpdater.Start()
+
+	// Admin panel HTML (served at /admin)
+	r.StaticFS("/admin", static.AdminFS())
 
 	// SPA frontend (embedded H5 build)
 	r.NoRoute(gin.WrapH(static.Handler()))
@@ -136,6 +201,7 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("forced shutdown: %v", err)
 	}
+	marketUpdater.Stop()
 	sqlDB.Close()
 	log.Println("server stopped")
 }

@@ -77,3 +77,58 @@ func (r *MarketPriceRepo) GetByDate(date string) ([]model.MarketPrice, error) {
 	err := r.db.Where("record_date = ?", date).Order("category, variety").Find(&items).Error
 	return items, err
 }
+
+func (r *MarketPriceRepo) GetSummary() (map[string]interface{}, error) {
+	var latestDate string
+	r.db.Model(&model.MarketPrice{}).Select("record_date").Order("record_date DESC").Limit(1).Scan(&latestDate)
+	if latestDate == "" {
+		return map[string]interface{}{"total_varieties": 0, "up_count": 0, "down_count": 0}, nil
+	}
+	var items []model.MarketPrice
+	r.db.Where("record_date = ?", latestDate).Find(&items)
+	total := len(items)
+	up, down := 0, 0
+	for _, it := range items {
+		if it.ChangePct > 0 {
+			up++
+		} else if it.ChangePct < 0 {
+			down++
+		}
+	}
+	return map[string]interface{}{
+		"total_varieties": total,
+		"up_count":        up,
+		"down_count":      down,
+		"record_date":     latestDate,
+	}, nil
+}
+
+func (r *MarketPriceRepo) GetTrend(variety string) ([]map[string]interface{}, error) {
+	var items []model.MarketPrice
+	err := r.db.Where("variety = ?", variety).
+		Order("record_date ASC").
+		Limit(50).
+		Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+	// Group by date, list prices per market
+	type point struct {
+		Date string  `json:"date"`
+		Price float64 `json:"price"`
+		Market string `json:"market"`
+	}
+	points := make([]point, 0, len(items))
+	for _, it := range items {
+		points = append(points, point{Date: it.RecordDate, Price: it.Price, Market: it.MarketName})
+	}
+	result := make([]map[string]interface{}, len(points))
+	for i, p := range points {
+		result[i] = map[string]interface{}{
+			"date":   p.Date,
+			"price":  p.Price,
+			"market": p.Market,
+		}
+	}
+	return result, nil
+}

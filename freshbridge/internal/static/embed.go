@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
-//go:embed web/*
+//go:embed web
 var webDir embed.FS
+
+//go:embed admin
+var adminDir embed.FS
 
 // Handler serves the embedded H5 frontend with SPA fallback.
 func Handler() http.Handler {
@@ -28,4 +31,10 @@ func Handler() http.Handler {
 		r.URL.Path = "/"
 		fileServer.ServeHTTP(w, r)
 	})
+}
+
+// AdminFS returns the embedded admin panel filesystem.
+func AdminFS() http.FileSystem {
+	sub, _ := fs.Sub(adminDir, "admin")
+	return http.FS(sub)
 }

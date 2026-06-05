@@ -1,6 +1,37 @@
 {
   "pages": [
     {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "行情中心"
+      }
+    },
+    {
+      "path": "pages/supply/index",
+      "style": {
+        "navigationBarTitleText": "货源",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/publish/index",
+      "style": {
+        "navigationBarTitleText": "发布"
+      }
+    },
+    {
+      "path": "pages/message/index",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
       "path": "pages/bookkeeping/index",
       "style": {
         "navigationBarTitleText": "快速记账"
@@ -40,34 +71,51 @@
       }
     },
     {
-      "path": "pages/home/index",
+      "path": "pages/mall/index",
       "style": {
-        "navigationBarTitleText": "首页"
+        "navigationBarTitleText": "品牌商城"
       }
     },
     {
-      "path": "pages/supply/index",
+      "path": "pages/mall/detail",
       "style": {
-        "navigationBarTitleText": "货源",
-        "enablePullDownRefresh": true
+        "navigationBarTitleText": "商品详情"
       }
     },
     {
-      "path": "pages/publish/index",
+      "path": "pages/mall/cart",
       "style": {
-        "navigationBarTitleText": "发布"
+        "navigationBarTitleText": "购物车"
       }
     },
     {
-      "path": "pages/message/index",
+      "path": "pages/mall/checkout",
       "style": {
-        "navigationBarTitleText": "消息"
+        "navigationBarTitleText": "确认订单"
       }
     },
     {
-      "path": "pages/mine/index",
+      "path": "pages/mall/orders",
       "style": {
-        "navigationBarTitleText": "我的"
+        "navigationBarTitleText": "我的订单"
+      }
+    },
+    {
+      "path": "pages/finance/index",
+      "style": {
+        "navigationBarTitleText": "商务服务"
+      }
+    },
+    {
+      "path": "pages/supply-demand/index",
+      "style": {
+        "navigationBarTitleText": "大宗供需"
+      }
+    },
+    {
+      "path": "pages/ranking/index",
+      "style": {
+        "navigationBarTitleText": "品种排行"
       }
     }
   ],
@@ -87,7 +135,7 @@
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "首页",
+        "text": "行情",
         "iconPath": "static/images/home.png",
         "selectedIconPath": "static/images/home-active.png"
       },

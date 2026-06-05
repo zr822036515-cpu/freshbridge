@@ -43,7 +43,7 @@ func (s *ProductService) ListByFarmer(farmerID int64) ([]model.Product, error) {
 	return s.repo.FindByFarmer(farmerID)
 }
 
-func (s *ProductService) Search(category, keyword string, page, pageSize int) ([]model.Product, int64, error) {
+func (s *ProductService) Search(category, keyword, variety string, page, pageSize int) ([]model.Product, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -51,5 +51,5 @@ func (s *ProductService) Search(category, keyword string, page, pageSize int) ([
 		pageSize = 20
 	}
 	offset := (page - 1) * pageSize
-	return s.repo.Search(category, keyword, pageSize, offset)
+	return s.repo.Search(category, keyword, variety, pageSize, offset)
 }

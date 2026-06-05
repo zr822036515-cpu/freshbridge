@@ -93,7 +93,7 @@
 
       <!-- Empty state -->
       <view v-if="filteredTrades.length === 0" class="empty-state">
-        <text class="empty-icon">🤝</text>
+        <image src="/static/images/handshake.svg" mode="aspectFit" class="empty-icon-img" />
         <text class="empty-text">暂无代卖订单</text>
         <text class="empty-sub">去货源页面接单，开始代卖</text>
       </view>

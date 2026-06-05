@@ -23,9 +23,34 @@ func AuthRequired(jwtSecret string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
-		claims := token.Claims.(jwt.MapClaims)
-		c.Set("user_id", int64(claims["user_id"].(float64)))
-		c.Set("role", claims["role"].(string))
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
+			return
+		}
+		uid, ok := claims["user_id"].(float64)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing user_id"})
+			return
+		}
+		role, _ := claims["role"].(string)
+		c.Set("user_id", int64(uid))
+		c.Set("role", role)
 		c.Next()
+	}
+}
+
+// RequireRole returns middleware that restricts access to the given roles.
+func RequireRole(roles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, _ := c.Get("role")
+		roleStr, _ := role.(string)
+		for _, r := range roles {
+			if roleStr == r {
+				c.Next()
+				return
+			}
+		}
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 	}
 }

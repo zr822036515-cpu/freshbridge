@@ -10,7 +10,7 @@
     "compilerVersion": "3"
   },
   "mp-weixin": {
-    "appid": "",
+    "appid": "wx72befb46333128b8",
     "setting": {
       "urlCheck": true,
       "es6": true,

@@ -1,10 +1,13 @@
 // API configuration
-// H5 dev: Vite proxy forwards /api → localhost:8080
-// Mini-program: use full URL
-const isH5 = typeof window !== 'undefined' && !window.wx
+// #ifdef H5
+const baseURL = '/api'
+// #endif
+// #ifdef MP-WEIXIN
+const baseURL = 'https://freshbridge.net.cn/api'
+// #endif
 
 const config = {
-  baseURL: isH5 ? '/api' : 'https://api.freshbridge.cn/api',
+  baseURL,
   timeout: 15000
 }
 

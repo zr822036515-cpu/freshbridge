@@ -49,9 +49,13 @@ func (h *ProductHandler) ListMy(c *gin.Context) {
 
 func (h *ProductHandler) Search(c *gin.Context) {
 	category := c.Query("category")
-	keyword := c.Query("q")
+	keyword := c.Query("keyword")
+	if keyword == "" {
+		keyword = c.Query("q")
+	}
+	variety := c.Query("variety")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
-	products, total, _ := h.svc.Search(category, keyword, page, pageSize)
+	products, total, _ := h.svc.Search(category, keyword, variety, page, pageSize)
 	c.JSON(http.StatusOK, gin.H{"products": products, "total": total})
 }

@@ -48,7 +48,7 @@
       <!-- Driver info -->
       <view class="card driver-card">
         <view class="driver-header">
-          <text class="driver-icon">👤</text>
+          <image src="/static/images/user.svg" mode="aspectFit" class="driver-icon-img" />
           <view class="driver-detail">
             <text class="driver-name">{{ delivery.driver_name || delivery.driver_phone || '--' }}</text>
             <text v-if="delivery.driver_phone" class="driver-phone">{{ delivery.driver_phone }}</text>

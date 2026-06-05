@@ -7,7 +7,7 @@
           <image :src="userInfo.avatar_url" mode="aspectFill" class="avatar-pic" />
         </view>
         <view v-else class="avatar-placeholder">
-          <text>👤</text>
+          <image src="/static/images/user.svg" mode="aspectFit" class="avatar-icon" />
         </view>
       </view>
       <view class="user-info" @tap="onLoginTap">
@@ -25,11 +25,11 @@
     <!-- Verification & credit info (only when logged in) -->
     <view v-if="userInfo" class="info-cards">
       <view class="info-card" :class="userInfo.verified ? 'verified' : 'unverified'">
-        <text class="info-card-icon">{{ userInfo.verified ? '✅' : '⚠️' }}</text>
+        <image :src="userInfo.verified ? '/static/images/check-circle.svg' : '/static/images/warning.svg'" mode="aspectFit" class="info-card-icon" />
         <text class="info-card-text">{{ userInfo.verified ? '已实名认证' : '未实名认证' }}</text>
       </view>
       <view class="info-card credit">
-        <text class="info-card-icon">⭐</text>
+        <image src="/static/images/star.svg" mode="aspectFit" class="info-card-icon" />
         <text class="info-card-text">信用分 {{ userInfo.credit_score || 100 }}</text>
       </view>
     </view>
@@ -53,33 +53,33 @@
     <!-- Navigation cards -->
     <view class="nav-section">
       <view class="nav-item card touch-target" @tap="onNavTap('我的货源')">
-        <text class="nav-icon">📦</text>
+        <image src="/static/images/package.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">我的货源</text>
         <text class="nav-arrow">></text>
       </view>
       <view class="nav-item card touch-target" @tap="onNavTap('代卖管理')">
-        <text class="nav-icon">🤝</text>
+        <image src="/static/images/handshake.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">代卖管理</text>
         <text class="nav-arrow">></text>
       </view>
       <view class="nav-item card touch-target" @tap="onNavTap('销售记录')">
-        <text class="nav-icon">📋</text>
+        <image src="/static/images/clipboard.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">销售记录</text>
         <text class="nav-arrow">></text>
       </view>
       <view class="nav-item card touch-target" @tap="onNavTap('结算对账')">
-        <text class="nav-icon">💰</text>
+        <image src="/static/images/wallet.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">结算对账</text>
         <text class="nav-arrow">></text>
       </view>
       <view class="nav-item card touch-target" @tap="onNavTap('实名认证')">
-        <text class="nav-icon">✅</text>
+        <image src="/static/images/check-circle.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">实名认证</text>
         <text class="nav-arrow">></text>
       </view>
       <!-- Switch role placeholder -->
       <view v-if="userInfo" class="nav-item card touch-target" @tap="onSwitchRole">
-        <text class="nav-icon">🔄</text>
+        <image src="/static/images/swap.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">切换角色</text>
         <text class="nav-arrow">></text>
       </view>
@@ -88,7 +88,7 @@
     <!-- Bottom actions -->
     <view class="bottom-section">
       <view class="nav-item card touch-target" @tap="onNavTap('设置')">
-        <text class="nav-icon">⚙️</text>
+        <image src="/static/images/settings.svg" mode="aspectFit" class="nav-icon" />
         <text class="nav-text">设置</text>
         <text class="nav-arrow">></text>
       </view>
@@ -221,7 +221,10 @@ function onLogout() {
 }
 
 .avatar-placeholder {
-  font-size: 56rpx;
+  .avatar-icon {
+    width: 56rpx;
+    height: 56rpx;
+  }
 }
 
 .avatar-pic {
@@ -299,8 +302,10 @@ function onLogout() {
 }
 
 .info-card-icon {
-  font-size: 32rpx;
+  width: 40rpx;
+  height: 40rpx;
   margin-right: 12rpx;
+  flex-shrink: 0;
 }
 
 .info-card-text {
@@ -348,7 +353,8 @@ function onLogout() {
 }
 
 .nav-icon {
-  font-size: 36rpx;
+  width: 44rpx;
+  height: 44rpx;
   margin-right: 20rpx;
   flex-shrink: 0;
 }
