@@ -1,24 +1,28 @@
 <template>
   <view class="page">
-    <!-- User info header -->
+    <!-- User info header - Stitch style -->
     <view class="user-header">
-      <view class="user-avatar touch-target" @tap="onLoginTap">
-        <view v-if="userInfo" class="avatar-img">
-          <image :src="userInfo.avatar_url" mode="aspectFill" class="avatar-pic" />
-        </view>
-        <view v-else class="avatar-placeholder">
-          <image src="/static/images/user.svg" mode="aspectFit" class="avatar-icon" />
-        </view>
-      </view>
-      <view class="user-info" @tap="onLoginTap">
-        <view class="user-name-row">
-          <text v-if="userInfo" class="user-name">{{ userInfo.nickname || '鲜桥用户' }}</text>
-          <text v-else class="user-name">点击登录</text>
-          <view v-if="userInfo" class="role-badge" :class="'role-' + userInfo.role">
-            <text>{{ roleLabel(userInfo.role) }}</text>
+      <view class="uh-gradient"></view>
+      <view class="uh-content">
+        <view class="user-avatar touch-target" @tap="onLoginTap">
+          <view v-if="userInfo" class="avatar-img">
+            <image :src="userInfo.avatar_url" mode="aspectFill" class="avatar-pic" />
+          </view>
+          <view v-else class="avatar-placeholder">
+            <image src="/static/images/user.svg" mode="aspectFit" class="avatar-icon" />
           </view>
         </view>
-        <text class="user-sub">{{ loginSubtitle }}</text>
+        <view class="user-info" @tap="onLoginTap">
+          <view class="user-name-row">
+            <text v-if="userInfo" class="user-name">{{ userInfo.nickname || '鲜桥用户' }}</text>
+            <text v-else class="user-name">点击登录</text>
+            <view v-if="userInfo" class="role-badge" :class="'role-' + userInfo.role">
+              <text>{{ roleLabel(userInfo.role) }}</text>
+            </view>
+          </view>
+          <view v-if="userInfo" class="vip-tag">VIP 会员</view>
+          <text class="user-sub">{{ loginSubtitle }}</text>
+        </view>
       </view>
     </view>
 

@@ -1,41 +1,83 @@
 <template>
   <view class="page">
-    <!-- Product image -->
-    <view class="img-wrap">
-      <image v-if="product.image_url" :src="product.image_url" mode="aspectFill" class="hero-img" />
-      <view v-else class="hero-placeholder">🍎</view>
+    <!-- Hero Image -->
+    <view class="hero-img">
+      <image v-if="product.img" :src="product.img" mode="aspectFill" class="hero-real-img" />
+      <text v-else class="hero-emoji">{{ product.emoji || '🍎' }}</text>
+      <view class="hero-badge"><text>1/1</text></view>
     </view>
 
-    <!-- Product info -->
-    <view class="info-card">
-      <text class="product-name">{{ product.name }}</text>
-      <view class="price-row">
-        <text class="price">¥{{ product.price.toFixed(2) }}</text>
-        <text v-if="product.original_price > product.price" class="original">¥{{ product.original_price.toFixed(2) }}</text>
+    <!-- Product Info -->
+    <view class="info-section">
+      <view class="tags-row">
+        <text class="tag">{{ product.grade || '精选' }}</text>
+        <text class="tag-text">· {{ product.origin || '严选产地' }}</text>
       </view>
-      <text class="sales">已售 {{ product.sales }} 件 | 库存 {{ product.stock }}</text>
+      <text class="product-name">{{ product.name || '商品详情' }}</text>
+      <view class="price-row">
+        <text class="price">¥{{ product.price || '--' }}</text>
+        <text v-if="product.originalPrice" class="old-price">¥{{ product.originalPrice }}</text>
+      </view>
+    </view>
+
+    <!-- Fast Facts -->
+    <view class="facts-grid">
+      <view class="fact-item">
+        <text class="fact-icon">⭐</text>
+        <text class="fact-label">品质</text>
+        <text class="fact-val">{{ product.grade || 'A级' }}</text>
+      </view>
+      <view class="fact-item">
+        <text class="fact-icon">⚖️</text>
+        <text class="fact-label">规格</text>
+        <text class="fact-val">{{ product.spec || '标准' }}</text>
+      </view>
+      <view class="fact-item">
+        <text class="fact-icon">🍬</text>
+        <text class="fact-label">糖度</text>
+        <text class="fact-val">{{ product.brix || '15°+' }}</text>
+      </view>
     </view>
 
     <!-- Description -->
-    <view class="section">
-      <text class="section-title">商品详情</text>
-      <text class="desc-text">{{ product.description || '暂无详情' }}</text>
-    </view>
-
-    <!-- Bottom bar -->
-    <view class="bottom-bar">
-      <view class="qty-row">
-        <text class="qty-label">数量</text>
-        <view class="qty-ctrl">
-          <view class="qty-btn" @tap="qty > 1 ? qty-- : 1">−</view>
-          <text class="qty-num">{{ qty }}</text>
-          <view class="qty-btn" @tap="qty++">+</view>
+    <view class="desc-section">
+      <text class="desc-title">商品详情</text>
+      <text class="desc-text">{{ product.description || '精选优质水果，从产地直达您的餐桌。每一颗都经过严格筛选，确保品质如一。' }}</text>
+      <view class="feature-list">
+        <view class="feature-item">
+          <text>✅</text>
+          <text>绿色种植，零农残认证</text>
+        </view>
+        <view class="feature-item">
+          <text>✅</text>
+          <text>冷链保鲜，航空直送</text>
+        </view>
+        <view class="feature-item">
+          <text>✅</text>
+          <text>精美礼盒包装，送礼体面</text>
         </view>
       </view>
-      <view class="action-row">
-        <view class="btn-cart" @tap="doAddCart">加入购物车</view>
-        <view class="btn-buy" @tap="buyNow">立即购买</view>
+    </view>
+
+    <!-- Origin Section -->
+    <view class="origin-card">
+      <view class="origin-img"><text>🌄</text></view>
+      <view class="origin-info">
+        <text class="origin-label">产地溯源</text>
+        <text class="origin-name">{{ product.origin_city || '优渥产地' }}</text>
       </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
+
+    <!-- Bottom Action Bar -->
+    <view class="bottom-bar">
+      <view class="bb-fav">
+        <text>🤍</text>
+        <text class="bb-fav-text">收藏</text>
+      </view>
+      <view class="bb-cart-btn" @tap="addToCart">加入购物车</view>
+      <view class="bb-buy-btn" @tap="buyNow">立即购买</view>
     </view>
   </view>
 </template>
@@ -46,69 +88,99 @@ import { onLoad } from '@dcloudio/uni-app'
 import { get, post } from '../../utils/api'
 
 const product = ref({})
-const qty = ref(1)
 
-onLoad((opt) => {
-  if (opt.id) fetchProduct(opt.id)
+onLoad((options) => {
+  if (options.id) fetchProduct(options.id)
 })
 
 async function fetchProduct(id) {
   try {
     const res = await get('/mall/products/' + id)
-    product.value = res
-  } catch (e) { /* silent */ }
+    product.value = { ...res, emoji: '🍇', img: '/static/images/mall/product-' + (((res.id || 1) % 8) + 1) + '.jpg', price: res.price, originalPrice: res.original_price }
+  } catch (e) {}
 }
 
-async function doAddCart() {
+async function addToCart() {
   try {
-    await post('/mall/cart', { product_id: product.value.id, quantity: qty.value })
+    await post('/mall/cart', { product_id: product.value.id, quantity: 1 })
     uni.showToast({ title: '已加入购物车', icon: 'success' })
-  } catch (e) {
-    uni.showToast({ title: '请先登录', icon: 'none' })
-  }
+  } catch (e) { uni.showToast({ title: '添加失败', icon: 'none' }) }
 }
-
 function buyNow() {
-  doAddCart().then(() => {
-    uni.navigateTo({ url: '/pages/mall/cart' })
-  })
+  addToCart()
+  uni.navigateTo({ url: '/pages/mall/checkout' })
 }
 </script>
 
 <style scoped lang="scss">
-.page { min-height: 100vh; background: #F5F5F5; padding-bottom: 160rpx; }
+.page { background: var(--bg); min-height: 100vh; }
 
-.img-wrap { width: 100%; height: 500rpx; background: #F0FDF4; display: flex; align-items: center; justify-content: center; }
-.hero-img { width: 100%; height: 100%; }
-.hero-placeholder { font-size: 120rpx; }
+.hero-img {
+  width: 100%; height: 600rpx; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-real-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-emoji { font-size: 180rpx; }
+.hero-badge {
+  position: absolute; bottom: 24rpx; right: 24rpx;
+  background: rgba(255,255,255,0.9); padding: 6rpx 20rpx;
+  border-radius: 24rpx; font-size: 24rpx; color: var(--text-secondary);
+}
 
-.info-card { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }
-.product-name { font-size: 36rpx; font-weight: 700; color: #14532D; display: block; }
-.price-row { margin-top: 16rpx; display: flex; align-items: baseline; gap: 12rpx; }
-.price { font-size: 44rpx; font-weight: 700; color: #EF4444; }
-.original { font-size: 28rpx; color: #999; text-decoration: line-through; }
-.sales { font-size: 26rpx; color: #999; margin-top: 8rpx; display: block; }
+.info-section { padding: 32rpx 24rpx 24rpx; background: #fff; }
+.tags-row { display: flex; align-items: center; gap: 8rpx; margin-bottom: 12rpx; }
+.tag { background: #FFDEA4; color: #5A4312; padding: 4rpx 14rpx; border-radius: 6rpx; font-size: 22rpx; font-weight: 600; }
+.tag-text { font-size: 24rpx; color: var(--text-muted); }
+.product-name { font-size: 36rpx; font-weight: 700; color: var(--text); display: block; margin-bottom: 12rpx; }
+.price-row { display: flex; align-items: baseline; gap: 16rpx; }
+.price { font-size: 44rpx; font-weight: 700; color: var(--primary); }
+.old-price { font-size: 28rpx; color: var(--text-muted); text-decoration: line-through; }
 
-.section { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }
-.section-title { font-size: 32rpx; font-weight: 600; color: #14532D; margin-bottom: 12rpx; display: block; }
-.desc-text { font-size: 30rpx; color: #666; line-height: 1.8; }
+.facts-grid {
+  display: flex; margin: 16rpx 24rpx; gap: 16rpx;
+}
+.fact-item {
+  flex: 1; background: #fff; border-radius: 12rpx; padding: 20rpx;
+  display: flex; flex-direction: column; align-items: center; gap: 6rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+.fact-icon { font-size: 36rpx; }
+.fact-label { font-size: 22rpx; color: var(--text-muted); }
+.fact-val { font-size: 26rpx; font-weight: 700; color: var(--text); }
+
+.desc-section { margin: 24rpx; background: #fff; border-radius: 16rpx; padding: 24rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.desc-title { font-size: 32rpx; font-weight: 700; color: var(--text); display: block; margin-bottom: 16rpx; }
+.desc-text { font-size: 28rpx; color: var(--text-secondary); line-height: 1.8; display: block; }
+.feature-list { margin-top: 24rpx; display: flex; flex-direction: column; gap: 16rpx; }
+.feature-item { display: flex; align-items: center; gap: 16rpx; font-size: 28rpx; color: var(--text-secondary); }
+
+.origin-card {
+  margin: 24rpx; border-radius: 16rpx; overflow: hidden; background: #fff;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); position: relative; height: 260rpx;
+}
+.origin-img {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #1A5C3E, #0F3B2C);
+  display: flex; align-items: center; justify-content: center; font-size: 100rpx;
+}
+.origin-info {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 20rpx 24rpx; background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+.origin-label { font-size: 22rpx; color: rgba(255,255,255,0.7); display: block; }
+.origin-name { font-size: 32rpx; font-weight: 700; color: #fff; display: block; margin-top: 4rpx; }
+
+.bottom-spacer { height: 160rpx; }
 
 .bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 16rpx 24rpx;
-  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom);
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  background: #fff; padding: 16rpx 24rpx 40rpx;
+  display: flex; align-items: center; gap: 12rpx;
+  box-shadow: 0 -2rpx 16rpx rgba(0,0,0,0.04); z-index: 50;
 }
-.qty-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
-.qty-label { font-size: 30rpx; color: #666; }
-.qty-ctrl { display: flex; align-items: center; gap: 16rpx; }
-.qty-btn {
-  width: 56rpx; height: 56rpx; line-height: 56rpx; text-align: center;
-  border: 2rpx solid #E5E7EB; border-radius: 8rpx; font-size: 32rpx; color: #333;
-}
-.qty-num { font-size: 32rpx; font-weight: 600; min-width: 48rpx; text-align: center; }
-.action-row { display: flex; gap: 16rpx; }
-.btn-cart, .btn-buy {
-  flex: 1; text-align: center; padding: 20rpx 0; border-radius: 12rpx; font-size: 32rpx; font-weight: 600;
-}
-.btn-cart { border: 2rpx solid #15803D; color: #15803D; background: #fff; }
-.btn-buy { background: #15803D; color: #fff; }
+.bb-fav { display: flex; flex-direction: column; align-items: center; gap: 2rpx; flex-shrink: 0; }
+.bb-fav-text { font-size: 20rpx; color: var(--text-muted); }
+.bb-cart-btn { flex: 1; text-align: center; padding: 24rpx 0; border-radius: 12rpx; border: 2rpx solid var(--gold); color: var(--gold); font-size: 28rpx; font-weight: 600; }
+.bb-buy-btn { flex: 1; text-align: center; padding: 24rpx 0; border-radius: 12rpx; background: var(--primary); color: #fff; font-size: 28rpx; font-weight: 700; }
 </style>

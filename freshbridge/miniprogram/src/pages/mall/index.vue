@@ -1,144 +1,129 @@
 <template>
   <view class="page">
-    <!-- Header -->
-    <view class="header">
-      <text class="header-title">品牌商城</text>
-      <view class="header-cart" @tap="goCart">
-        <text class="cart-icon">🛒</text>
-        <text v-if="cartCount > 0" class="cart-badge">{{ cartCount > 99 ? '99+' : cartCount }}</text>
+    <!-- Search -->
+    <view class="search-bar">
+      <view class="search-wrap">
+        <text>🔍</text>
+        <input class="search-input" type="text" placeholder="搜索精美水果礼盒..." v-model="keyword" />
+        <text>🔧</text>
       </view>
     </view>
 
-    <!-- Category tabs -->
-    <scroll-view scroll-x class="cat-tabs">
-      <view v-for="cat in categories" :key="cat.value" class="cat-tab" :class="{ active: activeCat === cat.value }" @tap="switchCat(cat.value)">
-        <text>{{ cat.label }}</text>
+    <!-- Category Tabs -->
+    <scroll-view scroll-x class="cat-scroll" :show-scrollbar="false">
+      <view class="cat-tabs">
+        <view v-for="t in catTabs" :key="t" class="cat-tab" :class="{ active: activeCat === t }" @tap="activeCat = t">{{ t }}</view>
       </view>
     </scroll-view>
 
-    <!-- Product list -->
-    <view v-if="loading" class="empty-text">加载中...</view>
-    <view v-else-if="products.length === 0" class="empty-text">暂无商品</view>
-    <view v-else class="product-grid">
-      <view v-for="p in products" :key="p.id" class="product-card" @tap="goDetail(p.id)">
-        <view class="card-img-wrap">
-          <image v-if="p.image_url" :src="p.image_url" mode="aspectFill" class="card-img" />
-          <view v-else class="card-img-placeholder">🍎</view>
+    <!-- Promo Banner -->
+    <view class="promo-banner">
+      <view class="promo-img"><text>🍒</text></view>
+      <view class="promo-content">
+        <text class="promo-tag">季节精选</text>
+        <text class="promo-title">夏季樱桃礼盒</text>
+        <text class="promo-sub">源自雅基玛山谷</text>
+      </view>
+    </view>
+
+    <!-- Product Grid -->
+    <view class="section-title-row">
+      <text class="section-title">精选好物</text>
+      <text class="section-more">查看全部 ›</text>
+    </view>
+    <view class="product-grid">
+      <view v-for="item in products" :key="item.id" class="product-card" @tap="goDetail(item)">
+        <view class="pc-img-wrap">
+          <image v-if="item.img" :src="item.img" mode="aspectFill" class="pc-img" />
+          <text v-else class="pc-img-text">{{ '🍎' }}</text>
+          <view class="pc-add-btn"><text>+</text></view>
         </view>
-        <view class="card-info">
-          <text class="card-name">{{ p.name }}</text>
-          <view class="card-price-row">
-            <text class="card-price">¥{{ p.price.toFixed(2) }}</text>
-            <text v-if="p.original_price > p.price" class="card-original">¥{{ p.original_price.toFixed(2) }}</text>
-          </view>
-          <view class="card-bottom">
-            <text class="card-sales">已售 {{ p.sales }}</text>
-            <view class="add-btn" @tap.stop="addToCart(p.id)">+</view>
+        <view class="pc-body">
+          <text class="pc-cat">{{ item.category || '精选' }}</text>
+          <text class="pc-name">{{ item.name }}</text>
+          <view class="pc-price-row">
+            <text class="pc-price">{{ item.price }}</text>
+            <text v-if="item.originalPrice" class="pc-old-price">{{ item.originalPrice }}</text>
           </view>
         </view>
       </view>
     </view>
+
+    <!-- Membership Banner -->
+    <view class="member-banner">
+      <view class="mb-text">
+        <text class="mb-title">Reserve 会员</text>
+        <text class="mb-sub">开通即享全场85折 + 优先抢购</text>
+      </view>
+      <view class="mb-btn"><text>立即加入</text></view>
+    </view>
+
+    <view class="bottom-spacer"></view>
   </view>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { get, post } from '../../utils/api'
+import { get } from '../../utils/api'
 
-const categories = [
-  { label: '全部', value: '' },
-  { label: '鲜果', value: 'fruit' },
-  { label: '礼盒', value: 'gift' },
-  { label: '其他', value: 'other' }
-]
-const activeCat = ref('')
-const loading = ref(true)
-const products = ref([])
-const cartCount = ref(0)
+const keyword = ref('')
+const activeCat = ref('全部')
+const catTabs = ['全部', '礼盒', '季节限定', '进口']
 
-function switchCat(cat) {
-  activeCat.value = cat
-  fetchProducts()
-}
+const products = ref([
+  { id: 1, name: '猫山王榴莲', category: '马来西亚进口', price: '¥428', originalPrice: '¥580', img: '/static/images/mall/product-1.jpg' },
+  { id: 2, name: '阳光玫瑰葡萄', category: '精选礼盒', price: '¥890', img: '/static/images/mall/product-2.jpg' },
+  { id: 3, name: '青森富士苹果', category: '手选精品', price: '¥120', img: '/static/images/mall/product-3.jpg' },
+  { id: 4, name: '金煌芒果', category: '异域精选', price: '¥249', img: '/static/images/mall/product-4.jpg' },
+])
 
 async function fetchProducts() {
-  loading.value = true
-  try {
-    const res = await get('/mall/products', { category: activeCat.value })
-    products.value = res.products || []
-  } catch (e) { /* silent */ }
-  loading.value = false
+  try { const res = await get('/mall/products'); products.value = (res.products || []).slice(0, 8).map(p => ({ ...p, name: p.name, price: '¥' + (p.price || 0), emoji: '🍎' })) } catch (e) {}
 }
-
-async function fetchCartCount() {
-  try {
-    const res = await get('/mall/cart/count')
-    cartCount.value = res.count || 0
-  } catch (e) { cartCount.value = 0 }
-}
-
-async function addToCart(productId) {
-  try {
-    await post('/mall/cart', { product_id: productId, quantity: 1 })
-    cartCount.value++
-    uni.showToast({ title: '已加入购物车', icon: 'success', duration: 1200 })
-  } catch (e) {
-    uni.showToast({ title: '请先登录', icon: 'none' })
-  }
-}
-
-function goDetail(id) { uni.navigateTo({ url: '/pages/mall/detail?id=' + id }) }
-function goCart() { uni.navigateTo({ url: '/pages/mall/cart' }) }
-
-onShow(() => {
-  fetchProducts()
-  fetchCartCount()
-})
+function goDetail(item) { uni.navigateTo({ url: '/pages/mall/detail?id=' + item.id }) }
+onShow(() => fetchProducts())
 </script>
 
 <style scoped lang="scss">
-.page { padding: 24rpx; min-height: 100vh; padding-bottom: 100rpx; }
+.page { padding: 24rpx; background: var(--bg); min-height: 100vh; }
 
-.header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx;
-  .header-title { font-size: 36rpx; font-weight: 700; color: #14532D; }
-  .header-cart { position: relative; padding: 8rpx; }
-  .cart-icon { font-size: 44rpx; }
-  .cart-badge {
-    position: absolute; top: -4rpx; right: -8rpx;
-    background: #EF4444; color: #fff; font-size: 20rpx;
-    min-width: 32rpx; height: 32rpx; line-height: 32rpx; text-align: center; border-radius: 16rpx; padding: 0 6rpx;
-  }
-}
+.search-bar { margin-bottom: 20rpx; }
+.search-wrap { display: flex; align-items: center; gap: 12rpx; background: #fff; border-radius: 14rpx; padding: 16rpx 20rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.search-input { flex: 1; font-size: 28rpx; border: none; outline: none; background: transparent; }
 
-.cat-tabs { white-space: nowrap; margin-bottom: 24rpx; }
-.cat-tab {
-  display: inline-block; padding: 12rpx 28rpx; margin-right: 16rpx;
-  border-radius: 32rpx; background: #fff; font-size: 28rpx; color: #666;
-  &.active { background: #15803D; color: #fff; }
-}
+.cat-scroll { margin-bottom: 24rpx; white-space: nowrap; }
+.cat-tabs { display: inline-flex; gap: 16rpx; }
+.cat-tab { padding: 12rpx 32rpx; border-radius: 32rpx; font-size: 26rpx; color: var(--text-secondary); background: #EDEEEB; transition: all 0.2s; display: inline-block; }
+.cat-tab.active { background: var(--primary); color: #fff; font-weight: 600; }
 
-.product-grid { display: flex; flex-wrap: wrap; gap: 16rpx; }
-.product-card {
-  width: calc(50% - 8rpx); background: #fff; border-radius: 12rpx; overflow: hidden; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
-}
-.card-img-wrap {
-  width: 100%; height: 280rpx; background: #F0FDF4; display: flex; align-items: center; justify-content: center;
-}
-.card-img { width: 100%; height: 100%; }
-.card-img-placeholder { font-size: 80rpx; }
-.card-info { padding: 16rpx; }
-.card-name { font-size: 30rpx; font-weight: 600; color: #14532D; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-price-row { margin-top: 8rpx; display: flex; align-items: baseline; gap: 8rpx; }
-.card-price { font-size: 34rpx; font-weight: 700; color: #EF4444; }
-.card-original { font-size: 24rpx; color: #999; text-decoration: line-through; }
-.card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 12rpx; }
-.card-sales { font-size: 24rpx; color: #999; }
-.add-btn {
-  width: 48rpx; height: 48rpx; line-height: 48rpx; text-align: center;
-  background: #15803D; color: #fff; font-size: 28rpx; border-radius: 50%; font-weight: 700;
-}
+.promo-banner { position: relative; border-radius: 16rpx; overflow: hidden; height: 260rpx; margin-bottom: 28rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.promo-img { width: 100%; height: 100%; background: linear-gradient(135deg, #1A5C3E, #0F3B2C); display: flex; align-items: center; justify-content: center; font-size: 120rpx; }
+.promo-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 24rpx; background: linear-gradient(transparent, rgba(0,0,0,0.7)); }
+.promo-tag { font-size: 20rpx; color: #fff; background: rgba(201,169,110,0.3); padding: 4rpx 12rpx; border-radius: 4rpx; }
+.promo-title { font-size: 36rpx; font-weight: 700; color: #fff; display: block; margin-top: 8rpx; }
+.promo-sub { font-size: 24rpx; color: rgba(255,255,255,0.7); display: block; margin-top: 4rpx; }
 
-.empty-text { font-size: 32rpx; color: #999; text-align: center; padding: 80rpx 0; }
+.section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+.section-title { font-size: 32rpx; font-weight: 700; color: var(--text); }
+.section-more { font-size: 26rpx; color: var(--primary); }
+
+.product-grid { display: flex; flex-wrap: wrap; gap: 16rpx; margin-bottom: 32rpx; }
+.product-card { width: calc(50% - 8rpx); background: #fff; border-radius: 16rpx; overflow: hidden; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); transition: transform 0.15s; &:active { transform: scale(0.97); } }
+.pc-img-wrap { position: relative; height: 280rpx; background: linear-gradient(135deg, #E8F5E9, #F1F8E9); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pc-img { width: 100%; height: 100%; position: absolute; inset: 0; }
+.pc-img-text { font-size: 100rpx; }
+.pc-add-btn { position: absolute; bottom: 16rpx; right: 16rpx; width: 56rpx; height: 56rpx; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32rpx; font-weight: 300; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.15); }
+.pc-body { padding: 16rpx 20rpx 20rpx; }
+.pc-cat { font-size: 22rpx; color: var(--text-muted); }
+.pc-name { font-size: 28rpx; font-weight: 700; color: var(--text); margin-top: 4rpx; display: block; }
+.pc-price-row { display: flex; align-items: baseline; gap: 8rpx; margin-top: 12rpx; }
+.pc-price { font-size: 32rpx; font-weight: 700; color: var(--primary); }
+.pc-old-price { font-size: 24rpx; color: var(--text-muted); text-decoration: line-through; }
+
+.member-banner { background: linear-gradient(135deg, #F5ECD7, #C9A96E); border-radius: 16rpx; padding: 24rpx; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; }
+.mb-title { font-size: 30rpx; font-weight: 700; color: #5A4312; display: block; }
+.mb-sub { font-size: 24rpx; color: rgba(90,67,18,0.7); margin-top: 4rpx; display: block; }
+.mb-btn { background: var(--primary); color: #fff; padding: 16rpx 32rpx; border-radius: 12rpx; font-size: 26rpx; font-weight: 600; }
+.bottom-spacer { height: 100rpx; }
 </style>

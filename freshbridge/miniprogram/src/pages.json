@@ -122,46 +122,46 @@
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "鲜桥",
-    "navigationBarBackgroundColor": "#15803D",
-    "backgroundColor": "#F0FDF4",
-    "backgroundColorTop": "#F0FDF4",
-    "backgroundColorBottom": "#F0FDF4"
+    "navigationBarBackgroundColor": "#0F3B2C",
+    "backgroundColor": "#F5F5F5",
+    "backgroundColorTop": "#F5F5F5",
+    "backgroundColorBottom": "#F5F5F5"
   },
   "tabBar": {
     "color": "#9CA3AF",
-    "selectedColor": "#15803D",
+    "selectedColor": "#0F3B2C",
     "borderStyle": "black",
     "backgroundColor": "#FFFFFF",
     "list": [
       {
         "pagePath": "pages/home/index",
         "text": "行情",
-        "iconPath": "static/images/home.png",
-        "selectedIconPath": "static/images/home-active.png"
+        "iconPath": "static/images/home.svg",
+        "selectedIconPath": "static/images/home-active.svg"
       },
       {
         "pagePath": "pages/supply/index",
         "text": "货源",
-        "iconPath": "static/images/supply.png",
-        "selectedIconPath": "static/images/supply-active.png"
+        "iconPath": "static/images/supply.svg",
+        "selectedIconPath": "static/images/supply-active.svg"
       },
       {
         "pagePath": "pages/publish/index",
         "text": "发布",
-        "iconPath": "static/images/publish.png",
-        "selectedIconPath": "static/images/publish-active.png"
+        "iconPath": "static/images/publish.svg",
+        "selectedIconPath": "static/images/publish-active.svg"
       },
       {
         "pagePath": "pages/message/index",
         "text": "消息",
-        "iconPath": "static/images/message.png",
-        "selectedIconPath": "static/images/message-active.png"
+        "iconPath": "static/images/message.svg",
+        "selectedIconPath": "static/images/message-active.svg"
       },
       {
         "pagePath": "pages/mine/index",
         "text": "我的",
-        "iconPath": "static/images/mine.png",
-        "selectedIconPath": "static/images/mine-active.png"
+        "iconPath": "static/images/mine.svg",
+        "selectedIconPath": "static/images/mine-active.svg"
       }
     ]
   },

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>达人邀约助手</title>  <script type="module" crossorigin src="/assets/popup.html--9-AEpeI.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/popup-BapHz1Lz.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🔥 达人邀约助手</h1>
+    <div class="stats">
+      <span>今日: <b id="s1">0</b></span>
+      <span>成功: <b id="s2">0</b></span>
+      <span>失败: <b id="s3">0</b></span>
+    </div>
+  </header>
+  <nav>
+    <button class="tab active" data-tab="tpl">💬 话术</button>
+    <button class="tab" data-tab="set">⚙️ 设置</button>
+  </nav>
+  <section id="tab-tpl" class="active">
+    <div class="fld"><label>商品名</label><input id="pname" placeholder="话术变量替换用"></div>
+    <div class="fld"><label>佣金</label><input id="prate" placeholder="如 20%"></div>
+    <div class="fld"><label>话术模板</label></div>
+    <div id="tpl-list"></div>
+    <button class="btn sm outline" id="addTpl">+ 添加</button>
+    <div class="hint">变量: <code>{达人昵称}</code><code>{商品名}</code><code>{佣金比例}</code></div>
+    <button class="btn primary full" id="saveTpl">💾 保存</button>
+  </section>
+  <section id="tab-set">
+    <div class="fld"><label>邀约间隔(毫秒)</label>
+      <div class="row"><input id="dmin" placeholder="最小" style="width:80px"><span>-</span><input id="dmax" placeholder="最大" style="width:80px"></div>
+    </div>
+    <button class="btn primary full" id="saveSet">💾 保存</button>
+    <hr>
+    <button class="btn danger full" id="clear">🗑 清空记录</button>
+  </section>
+  <footer><span id="status">✅ 就绪</span></footer>
+</div>
+</body>
+</html>

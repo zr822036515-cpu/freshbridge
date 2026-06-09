@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "达人邀约助手",
+  "version": "1.0.0",
+  "description": "精选联盟达人批量邀约工具",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "assets/content.js-DVyBoIW_.js"
+      ],
+      "matches": [
+        "*://buyin.jinritemai.com/dashboard*"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "达人邀约助手",
+    "default_icon": {
+      "16": "public/icons/icon-16.png",
+      "48": "public/icons/icon-48.png",
+      "128": "public/icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "public/icons/icon-16.png",
+    "48": "public/icons/icon-48.png",
+    "128": "public/icons/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "*://buyin.jinritemai.com/*"
+      ],
+      "resources": [
+        "assets/content.js-DVyBoIW_.js"
+      ],
+      "use_dynamic_url": false
+    }
+  ]
+}

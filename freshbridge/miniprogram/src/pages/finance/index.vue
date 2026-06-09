@@ -190,10 +190,10 @@ onShow(() => { fetchData() })
 
 .pillar-icon { font-size: 44rpx; }
 .pillar-body { flex: 1; }
-.pillar-title { font-size: 34rpx; font-weight: 700; color: #14532D; display: block; }
-.pillar-slogan { font-size: 24rpx; color: #999; margin-top: 4rpx; display: block; }
+.pillar-title { font-size: 34rpx; font-weight: 700; color: var(--text); display: block; }
+.pillar-slogan { font-size: 24rpx; color: var(--text-muted); margin-top: 4rpx; display: block; }
 .pillar-items { margin-top: 14rpx; }
-.pi-row { display: flex; align-items: center; padding: 6rpx 0; font-size: 26rpx; color: #666; }
+.pi-row { display: flex; align-items: center; padding: 6rpx 0; font-size: 26rpx; color: var(--text-secondary); }
 .pi-dot {
   width: 10rpx; height: 10rpx; border-radius: 50%; background: #86EFAC;
   margin-right: 12rpx; flex-shrink: 0;

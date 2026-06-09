@@ -1,4 +1,5 @@
 {
+  "enabledMcpjsonServers": ["stitch"],
   "permissions": {
     "allow": [
       "Bash(python search.py \"dashboard real-time monitoring data overview\" --domain chart)",
@@ -29,7 +30,31 @@
       "Bash(curl -s http://localhost:8080/api/health)",
       "Bash(curl -s -X POST http://localhost:8080/api/auth/wechat-login -H \"Content-Type: application/json\" -d '{\"code\":\"test_code_stall_1\"}')",
       "Bash(python -c ' *)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "Bash(curl -s \"http://localhost:3000/src/pages/mine/index.vue\")",
+      "Bash(curl -s \"http://localhost:3000/src/pages/home/index.vue\")",
+      "Bash(curl -s \"http://localhost:3000/src/pages/supply/index.vue\")",
+      "Bash(ls -la /c/Users/Administrator/Desktop/claude/freshbridge/miniprogram/dist/build/h5/ 2>/dev/null | head -20)",
+      "Read(//c/Users/Administrator/Desktop/claude/freshbridge/miniprogram/dist/build/h5//**)",
+      "Bash(ls /c/Users/Administrator/Desktop/claude/freshbridge/cmd/server/server.exe 2>/dev/null; which go 2>/dev/null; ls \"/c/Program Files/Go/bin/go.exe\" 2>/dev/null; ls /c/Go/bin/go.exe 2>/dev/null)",
+      "Read(//c/Users/Administrator/Desktop/claude/freshbridge/cmd/server/**)",
+      "Read(//c/Users/Administrator/Desktop/claude/freshbridge/miniprogram/**)",
+      "Bash(npm run *)",
+      "Bash(git -C /c/Users/Administrator/Desktop/claude add freshbridge/cmd/server/main.go freshbridge/internal/handler/settlement.go freshbridge/miniprogram/src/pages/consignment/index.vue freshbridge/miniprogram/src/pages/bookkeeping/index.vue freshbridge/miniprogram/src/pages/sales-history/index.vue)",
+      "Bash(mysql -u root freshbridge)",
+      "Bash(mysql -u root freshbridge -e \"SELECT COUNT\\(*\\) AS total FROM market_prices; SELECT variety, price, change_pct, market_name FROM market_prices WHERE record_date='2026-05-28' LIMIT 5;\")",
+      "Bash(DB_DSN=\"root:@tcp\\(127.0.0.1:3306\\)/freshbridge?charset=utf8mb4&parseTime=True\" \"/c/Users/Administrator/Desktop/claude/freshbridge/cmd/server/server.exe\")",
+      "Bash(curl -s http://127.0.0.1:8080/api/market/prices)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); prices=d.get\\('prices',[]\\); print\\(f'行情数据: {len\\(prices\\)} 条'\\); [print\\(f'  {p[\\\\\"variety\\\\\"]:14s} ¥{p[\\\\\"price\\\\\"]:.2f} {p[\\\\\"change_pct\\\\\"]:+.1f}%  {p[\\\\\"market_name\\\\\"]}'\\) for p in prices[:8]]\")",
+      "Bash(where python *)",
+      "Bash(pip list *)",
+      "Bash(dir \"C:\\\\Users\\\\Administrator\\\\.claude\\\\*\")",
+      "Bash(node buy-server.js)",
+      "Bash(ssh -o IdentitiesOnly=yes -o IdentityFile=~/.ssh/id_ed25519 admin@114.55.173.112 \"ls -la /opt/freshbridge/backend/.env 2>&1\")",
+      "Bash(node debug-page.js)",
+      "Bash(markitdown *)",
+      "Bash(python -c *markitdown*)",
+      "Bash(ssh admin@114.55.173.112 \"curl -s http://100.100.100.200/latest/meta-data/security-groups && echo '' && curl -s http://100.100.100.200/latest/meta-data/eipv4\")"
     ]
   }
 }

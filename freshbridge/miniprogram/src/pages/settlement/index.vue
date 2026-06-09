@@ -1,93 +1,105 @@
 <template>
   <view class="page">
     <!-- Header -->
-    <view class="header">
-      <text class="header-title">结算对账</text>
+    <view class="page-header">
+      <text class="page-title">结算对账</text>
+    </view>
+
+    <!-- Summary Bento Grid -->
+    <view class="summary-grid">
+      <view class="summary-main">
+        <text class="sm-label">当前待结算总额</text>
+        <text class="sm-amount">¥{{ fmtMoney(summary.received > 0 ? summary.sales - summary.received : summary.sales) }}</text>
+        <view class="sm-date-row">
+          <text>📅</text>
+          <text class="sm-date-text">统计截止至 {{ currentYear }}年{{ currentMonth }}月</text>
+        </view>
+      </view>
+      <view class="summary-mini">
+        <text class="smi-label">本月营收</text>
+        <text class="smi-num">¥{{ fmtMoney(summary.sales / 1000) }}k</text>
+        <view class="smi-change up">
+          <text>▲ 较上月 +12%</text>
+        </view>
+      </view>
+      <view class="summary-mini gold">
+        <text class="smi-label">平均佣金率</text>
+        <text class="smi-num gold-text">4.5%</text>
+        <view class="smi-change">
+          <text>✅ 优选供应商</text>
+        </view>
+      </view>
     </view>
 
     <!-- Month selector -->
     <view class="month-selector">
-      <view class="month-arrow touch-target" @tap="prevMonth">
-        <text class="arrow-text">&lt;</text>
+      <view class="month-arrow" @tap="prevMonth">
+        <text>&lt;</text>
       </view>
       <text class="month-label">{{ currentYear }}年{{ currentMonth }}月</text>
-      <view class="month-arrow touch-target" @tap="nextMonth">
-        <text class="arrow-text">&gt;</text>
-      </view>
-    </view>
-
-    <!-- Summary cards -->
-    <view class="summary-row">
-      <view class="summary-card card">
-        <text class="summary-label">本月销售额</text>
-        <text class="summary-value amount-green">¥{{ fmtMoney(summary.sales) }}</text>
-      </view>
-      <view class="summary-card card">
-        <text class="summary-label">平台服务费</text>
-        <text class="summary-value" style="color:#CA8A04;">¥{{ fmtMoney(summary.fee) }}</text>
-      </view>
-      <view class="summary-card card summary-full">
-        <text class="summary-label">实际到账</text>
-        <text class="summary-value" style="color:#14532D;">¥{{ fmtMoney(summary.received) }}</text>
-        <text class="summary-sub">共 {{ summary.count }} 笔结算</text>
+      <view class="month-arrow" @tap="nextMonth">
+        <text>&gt;</text>
       </view>
     </view>
 
     <!-- Loading -->
-    <view v-if="loading" class="loading-box">
-      <text class="loading-text">加载中...</text>
+    <view v-if="loading" class="loading-state">
+      <text>加载中...</text>
     </view>
 
-    <!-- Settlement list -->
-    <view v-if="!loading && settlements.length > 0" class="list">
-      <view v-for="item in settlements" :key="item.id" class="settlement-card card">
-        <!-- Trade summary -->
-        <view class="settlement-top">
-          <view class="trade-info">
-            <text class="trade-name">{{ item.trade_summary || '交易汇总' }}</text>
-            <text class="trade-date">{{ fmtDate(item.settled_at || item.created_at) }}</text>
+    <!-- Settlement List -->
+    <view v-if="!loading" class="settlement-list">
+      <view v-for="item in settlements" :key="item.id" class="settlement-card" @tap="showDetail(item)">
+        <!-- Top: month badge + title + status -->
+        <view class="stl-top">
+          <view class="stl-month-badge">
+            <text>{{ currentMonth }}</text>
           </view>
-          <view class="status-badge" :class="statusClass(item.status)">
+          <view class="stl-info">
+            <text class="stl-title">{{ currentYear }}年{{ currentMonth }}月结算</text>
+            <text class="stl-period">对账周期: {{ item.period_start || '01' }} - {{ item.period_end || '31' }}</text>
+          </view>
+          <view class="stl-status" :class="'status-' + (item.status || 'pending')">
             <text>{{ statusLabel(item.status) }}</text>
           </view>
         </view>
 
-        <!-- Sales total -->
-        <view class="total-row">
-          <text class="total-label">销售总额</text>
-          <text class="total-value amount-green">¥{{ fmtMoney(item.total_sales) }}</text>
-        </view>
-
-        <!-- Breakdown -->
-        <view class="breakdown">
-          <view class="breakdown-item">
-            <text class="breakdown-label">平台服务费</text>
-            <text class="breakdown-value">-¥{{ fmtMoney(item.platform_fee) }}</text>
+        <!-- 3-column breakdown -->
+        <view class="stl-breakdown">
+          <view class="stl-col">
+            <text class="stl-col-label">总营收</text>
+            <text class="stl-col-val">¥{{ fmtMoney(item.total_sales) }}</text>
           </view>
-          <view class="breakdown-item">
-            <text class="breakdown-label">物流费</text>
-            <text class="breakdown-value">-¥{{ fmtMoney(item.logistics_fee) }}</text>
+          <view class="stl-col">
+            <text class="stl-col-label">平台佣金</text>
+            <text class="stl-col-val fee">-¥{{ fmtMoney((item.platform_fee || 0) + (item.stall_commission || 0)) }}</text>
           </view>
-          <view class="breakdown-item">
-            <text class="breakdown-label">损耗扣除</text>
-            <text class="breakdown-value">-¥{{ fmtMoney(item.loss_deduction) }}</text>
-          </view>
-          <view class="breakdown-item">
-            <text class="breakdown-label">档口佣金</text>
-            <text class="breakdown-value">-¥{{ fmtMoney(item.stall_commission) }}</text>
-          </view>
-          <view class="breakdown-item highlight">
-            <text class="breakdown-label">农户实收</text>
-            <text class="breakdown-value amount-green">¥{{ fmtMoney(item.farmer_amount) }}</text>
+          <view class="stl-col">
+            <text class="stl-col-label">实收金额</text>
+            <text class="stl-col-val net">¥{{ fmtMoney(item.farmer_amount) }}</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- Empty -->
-    <view v-if="!loading && settlements.length === 0" class="card empty-box">
+    <view v-if="!loading && settlements.length === 0" class="empty-state">
+      <text class="empty-icon">📊</text>
       <text class="empty-text">暂无结算记录</text>
     </view>
+
+    <!-- Promotion Banner -->
+    <view class="promo-banner">
+      <view class="promo-content">
+        <text class="promo-title">升级金牌商户</text>
+        <text class="promo-sub">享佣金减免</text>
+        <view class="promo-btn">
+          <text>立即申请</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
   </view>
 </template>
 
@@ -109,18 +121,9 @@ function fmtMoney(val) {
   return n.toFixed(2)
 }
 
-function fmtDate(val) {
-  if (!val) return '--'
-  return String(val).slice(0, 10)
-}
-
 function statusLabel(s) {
-  const map = { pending: '待确认', confirmed: '已确认', paid: '已到账' }
+  const map = { pending: '待结算 PENDING', confirmed: '已确认', paid: '已结算 SETTLED' }
   return map[s] || s || '--'
-}
-
-function statusClass(s) {
-  return 'status-' + (s || 'pending')
 }
 
 function recalcSummary() {
@@ -137,63 +140,81 @@ function recalcSummary() {
 async function loadSettlements() {
   loading.value = true
   try {
-    const res = await get('/settlements', {
-      year: currentYear.value,
-      month: currentMonth.value
-    })
+    const res = await get('/settlements', { year: currentYear.value, month: currentMonth.value })
     settlements.value = res.settlements || []
     recalcSummary()
   } catch (e) {
     settlements.value = []
     Object.assign(summary, { sales: 0, fee: 0, received: 0, count: 0 })
-  } finally {
-    loading.value = false
   }
+  loading.value = false
 }
 
 function prevMonth() {
-  if (currentMonth.value === 1) {
-    currentYear.value--
-    currentMonth.value = 12
-  } else {
-    currentMonth.value--
-  }
+  if (currentMonth.value === 1) { currentYear.value--; currentMonth.value = 12 }
+  else { currentMonth.value-- }
   loadSettlements()
 }
 
 function nextMonth() {
-  if (currentMonth.value === 12) {
-    currentYear.value++
-    currentMonth.value = 1
-  } else {
-    currentMonth.value++
-  }
+  if (currentMonth.value === 12) { currentYear.value++; currentMonth.value = 1 }
+  else { currentMonth.value++ }
   loadSettlements()
 }
 
-onMounted(() => {
-  loadSettlements()
-})
+function showDetail(item) {
+  uni.showToast({ title: '查看结算详情', icon: 'none' })
+}
+
+onMounted(() => { loadSettlements() })
 </script>
 
 <style scoped lang="scss">
 .page {
   padding: 24rpx;
   min-height: 100vh;
+  background: var(--bg);
 }
 
-.header {
+.page-header { margin-bottom: 24rpx; }
+.page-title { font-size: 40rpx; font-weight: 700; color: var(--text); }
+
+/* Summary Bento Grid */
+.summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
   margin-bottom: 24rpx;
-
-  &-title {
-    font-size: 36rpx;
-    font-weight: 700;
-    color: var(--text);
-    display: block;
-  }
 }
+.summary-main {
+  width: 100%;
+  background: var(--primary);
+  border-radius: 16rpx;
+  padding: 32rpx;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.sm-label { font-size: 24rpx; opacity: 0.8; display: block; }
+.sm-amount { font-size: 52rpx; font-weight: 700; display: block; margin-top: 8rpx; }
+.sm-date-row { display: flex; align-items: center; gap: 8rpx; margin-top: 16rpx; }
+.sm-date-text { font-size: 24rpx; opacity: 0.8; }
 
-/* Month selector */
+.summary-mini {
+  flex: 1;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+.summary-mini.gold { background: #FFDEA4; }
+.smi-label { font-size: 24rpx; color: var(--text-muted); display: block; }
+.smi-num { font-size: 40rpx; font-weight: 700; color: var(--text); display: block; margin-top: 8rpx; }
+.smi-num.gold-text { color: #5A4312; }
+.smi-change { font-size: 20rpx; margin-top: 8rpx; display: block; }
+.smi-change.up { color: var(--up); }
+
+/* Month Selector */
 .month-selector {
   display: flex;
   align-items: center;
@@ -201,203 +222,99 @@ onMounted(() => {
   margin-bottom: 24rpx;
   gap: 32rpx;
 }
-
 .month-arrow {
-  width: 72rpx;
-  height: 72rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--white);
-  border: 1px solid var(--border);
+  width: 72rpx; height: 72rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff;
   border-radius: 50%;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  font-size: 36rpx; font-weight: 700; color: var(--primary);
 }
+.month-label { font-size: 34rpx; font-weight: 600; color: var(--text); min-width: 200rpx; text-align: center; }
 
-.arrow-text {
-  font-size: 36rpx;
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.month-label {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: var(--text);
-  min-width: 200rpx;
-  text-align: center;
-}
-
-/* Summary cards */
-.summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  margin-bottom: 32rpx;
-}
-
-.summary-card {
-  flex: 1;
-  min-width: 200rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24rpx 16rpx;
-  margin-bottom: 0;
-}
-
-.summary-full {
-  flex-basis: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.summary-label {
-  font-size: 26rpx;
-  color: var(--text-muted);
-  margin-bottom: 8rpx;
-}
-
-.summary-value {
-  font-size: 36rpx;
-  font-weight: 700;
-}
-
-.summary-sub {
-  font-size: 24rpx;
-  color: var(--text-muted);
-}
-
-/* Loading */
-.loading-box {
-  padding: 80rpx 0;
-  text-align: center;
-}
-
-.loading-text {
-  font-size: 28rpx;
-  color: var(--text-muted);
-}
-
-/* Settlement list */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
+/* Settlement Cards */
+.settlement-list { display: flex; flex-direction: column; gap: 16rpx; }
 .settlement-card {
+  background: #fff;
+  border-radius: 12rpx;
   padding: 24rpx;
-  margin-bottom: 0;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+  &:active { transform: scale(0.98); }
 }
 
-.settlement-top {
+.stl-top {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  gap: 16rpx;
   margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx dashed var(--border-light);
 }
-
-.trade-info {
-  flex: 1;
-}
-
-.trade-name {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text);
-  display: block;
-  margin-bottom: 6rpx;
-}
-
-.trade-date {
-  font-size: 24rpx;
-  color: var(--text-muted);
-}
-
-/* Status badges */
-.status-badge {
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 24rpx;
-  line-height: 1.6;
+.stl-month-badge {
+  width: 72rpx; height: 72rpx;
+  border-radius: 12rpx;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36rpx; font-weight: 700; color: #fff;
   flex-shrink: 0;
 }
+.stl-info { flex: 1; }
+.stl-title { font-size: 32rpx; font-weight: 700; color: var(--text); display: block; }
+.stl-period { font-size: 24rpx; color: var(--text-muted); margin-top: 4rpx; display: block; }
 
-.status-pending {
-  background-color: #FEF3C7;
-  color: #CA8A04;
+.stl-status {
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  flex-shrink: 0;
 }
+.status-pending { background: #FEF3C7; color: #CA8A04; }
+.status-confirmed { background: #DBEAFE; color: #2563EB; }
+.status-paid { background: #DCFCE7; color: #15803D; }
 
-.status-confirmed {
-  background-color: #DBEAFE;
-  color: #2563EB;
+/* 3-col breakdown */
+.stl-breakdown { display: flex; }
+.stl-col {
+  flex: 1;
+  text-align: center;
+  padding: 8rpx 0;
+  &:nth-child(2) { border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light); }
 }
+.stl-col-label { font-size: 22rpx; color: var(--text-muted); text-transform: uppercase; display: block; }
+.stl-col-val { font-size: 30rpx; font-weight: 700; color: var(--text); margin-top: 8rpx; display: block; }
+.stl-col-val.fee { color: var(--danger); font-size: 26rpx; }
+.stl-col-val.net { color: var(--primary); }
 
-.status-paid {
-  background-color: #DCFCE7;
-  color: #15803D;
+/* Loading & Empty */
+.loading-state { padding: 80rpx 0; text-align: center; color: var(--text-muted); font-size: 28rpx; }
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 120rpx 0; }
+.empty-icon { font-size: 80rpx; margin-bottom: 24rpx; }
+.empty-text { font-size: 28rpx; color: var(--text-muted); }
+
+/* Promotion Banner */
+.promo-banner {
+  margin-top: 32rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary), #1A5C3E);
+  padding: 32rpx;
+  position: relative;
 }
-
-/* Total row */
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 0;
-  border-top: 1rpx solid var(--border);
-  border-bottom: 1rpx solid var(--border);
-  margin-bottom: 16rpx;
-}
-
-.total-label {
-  font-size: 32rpx;
-  color: var(--text-secondary);
-}
-
-.total-value {
-  font-size: 36rpx;
+.promo-content { position: relative; z-index: 1; }
+.promo-title { font-size: 36rpx; font-weight: 700; color: #fff; display: block; }
+.promo-sub { font-size: 28rpx; color: rgba(255,255,255,0.7); margin-top: 8rpx; display: block; }
+.promo-btn {
+  margin-top: 24rpx;
+  background: #FFDEA4;
+  color: #5A4312;
+  display: inline-block;
+  padding: 16rpx 40rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
   font-weight: 700;
 }
 
-/* Breakdown */
-.breakdown-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8rpx 0;
-}
-
-.breakdown-item.highlight {
-  margin-top: 8rpx;
-  padding-top: 16rpx;
-  border-top: 1rpx dashed var(--border);
-}
-
-.breakdown-label {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-}
-
-.breakdown-value {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-}
-
-.highlight .breakdown-label {
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Empty */
-.empty-box {
-  padding: 80rpx 0;
-}
-
-.empty-text {
-  font-size: 32rpx;
-  color: var(--text-muted);
-  text-align: center;
-  display: block;
-}
+.bottom-spacer { height: 80rpx; }
 </style>
