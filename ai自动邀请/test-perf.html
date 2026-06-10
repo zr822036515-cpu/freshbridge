@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html><body><div id="root"></div>
+<script type="module">
+// 模拟 Shadow DOM 环境测试添加模板性能
+const t0 = performance.now();
+
+// 1. 模拟 renderOneTemplate
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+function renderOneTemplate(t, i) {
+  return `<div class="tpl-item" data-idx="${i}" style="display:flex;gap:8px;margin-bottom:8px;padding:8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff">
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <input class="tpl-content" value="${escHtml(t.content)}" style="flex:1;font-size:12px;padding:5px;border:1px solid #E2E8F0;border-radius:4px" data-idx="${i}">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="tpl-name" value="${escHtml(t.name||'')}" style="width:100px;font-size:11px;padding:3px 6px;border:1px solid #E2E8F0;border-radius:3px" data-idx="${i}">
+        <select class="tpl-group" data-idx="${i}" style="font-size:11px;padding:3px;border:1px solid #E2E8F0;border-radius:3px">
+          <option value="通用">通用</option><option value="高佣">高佣</option><option value="纯佣">纯佣</option><option value="置换">置换</option>
+        </select>
+        <button class="tpl-toggle" data-idx="${i}">启用</button>
+        <button class="tpl-del" data-idx="${i}">删</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+const root = document.getElementById('root');
+
+// 测试 insertAdjacentHTML
+let times = [];
+for (let i = 0; i < 10; i++) {
+  const t1 = performance.now();
+  const html = renderOneTemplate({ id:'t'+i, name:'测试', group:'通用', content:'Hi {达人昵称}，【{商品名}】诚邀合作，佣金{佣金比例}%！测试内容', enabled:true }, i);
+  root.insertAdjacentHTML('beforeend', html);
+  const t2 = performance.now();
+  times.push(t2 - t1);
+}
+
+const tEnd = performance.now();
+console.log('10次添加耗时:', times.map(t=>t.toFixed(2)+'ms').join(', '));
+console.log('总耗时:', (tEnd-t0).toFixed(2)+'ms');
+console.log('平均:', (times.reduce((a,b)=>a+b,0)/times.length).toFixed(2)+'ms');
+
+// 测试 scrollIntoView + focus
+const last = root.lastElementChild;
+const t3 = performance.now();
+last.scrollIntoView({ behavior: 'instant', block: 'center' });
+last.querySelector('.tpl-content')?.focus();
+const t4 = performance.now();
+console.log('scrollIntoView+focus耗时:', (t4-t3).toFixed(2)+'ms');
+</script>
+</body></html>

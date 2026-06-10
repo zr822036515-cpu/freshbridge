@@ -3,26 +3,16 @@
   "name": "精选联盟达人邀约助手",
   "version": "2.0.0",
   "description": "精选联盟达人智能筛选、批量邀约、数据分析工具",
-  "permissions": [
-    "storage",
-    "unlimitedStorage"
-  ],
-  "host_permissions": [
-    "https://*/*",
-    "http://*/*"
-  ],
+  "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": ["https://*/*", "http://*/*"],
   "background": {
-    "service_worker": "service-worker-loader.js",
+    "service_worker": "src/background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "js": [
-        "assets/index.js-ipK3LiYh.js"
-      ],
-      "matches": [
-        "*://buyin.jinritemai.com/*"
-      ],
+      "matches": ["*://buyin.jinritemai.com/*"],
+      "js": ["src/content/index.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
@@ -40,16 +30,5 @@
     "16": "public/icons/icon-16.png",
     "48": "public/icons/icon-48.png",
     "128": "public/icons/icon-128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "matches": [
-        "*://buyin.jinritemai.com/*"
-      ],
-      "resources": [
-        "assets/index.js-ipK3LiYh.js"
-      ],
-      "use_dynamic_url": false
-    }
-  ]
+  }
 }
