@@ -1,6 +1,29 @@
 <template>
   <view class="page">
-    <!-- Banner Carousel -->
+    <!-- ===== Zone 1: 品牌栏 + 消息入口 ===== -->
+    <view class="brand-bar">
+      <view class="brand-logo">
+        <view class="logo-leaf"><text>🍃</text></view>
+        <text class="logo-text">鲜桥</text>
+      </view>
+      <view class="brand-actions">
+        <view class="bell-wrap" @tap="goMessages">
+          <text class="bell-icon">🔔</text>
+          <view v-if="unreadCount > 0" class="bell-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Search Bar -->
+    <view class="home-search" @tap="focusSearch">
+      <view class="hs-wrap">
+        <text class="hs-icon">🔍</text>
+        <input class="hs-input" type="text" placeholder="搜索品种、产地或档口..." />
+        <view class="hs-btn">搜索</view>
+      </view>
+    </view>
+
+    <!-- ===== Zone 1.5: Banner 轮播图 ===== -->
     <swiper class="banner-swiper" indicator-dots indicator-active-color="#C9A96E" autoplay circular>
       <swiper-item v-for="(b, i) in banners" :key="i">
         <view class="banner-slide">
@@ -8,183 +31,100 @@
           <view class="banner-overlay"></view>
           <view class="banner-content">
             <text class="banner-text">{{ b.text }}</text>
-            <text class="banner-sub">{{ b.sub || '鲜桥 FreshBridge' }}</text>
+            <text class="banner-sub">{{ b.sub }}</text>
           </view>
         </view>
       </swiper-item>
     </swiper>
 
-    <!-- 4-Column Quick Entries -->
-    <view class="quick-grid">
-      <view class="quick-item" @tap="goMall">
-        <view class="quick-icon-box qib-green">
-          <image src="/static/images/icon-mall.svg" mode="aspectFit" class="quick-img" />
+    <!-- ===== Zone 3: 核心功能双按钮 ===== -->
+    <view class="cta-row">
+      <view class="cta-card cta-supply" @tap="goPublish('supply')">
+        <view class="cta-icon-wrap cta-icon-green">
+          <text class="cta-icon">📤</text>
         </view>
-        <text class="quick-label">品牌商城</text>
+        <text class="cta-title">发布供应</text>
+        <text class="cta-sub">上架货源，找买家</text>
+        <view class="cta-tag tag-green">农户入口</view>
       </view>
-      <view class="quick-item" @tap="goFinance">
-        <view class="quick-icon-box qib-gold">
-          <image src="/static/images/icon-service.svg" mode="aspectFit" class="quick-img" />
+      <view class="cta-card cta-buy" @tap="goPublish('buy')">
+        <view class="cta-icon-wrap cta-icon-orange">
+          <text class="cta-icon">📥</text>
         </view>
-        <text class="quick-label">全链路服务</text>
-      </view>
-      <view class="quick-item" @tap="goSupplyDemand">
-        <view class="quick-icon-box qib-orange">
-          <image src="/static/images/icon-supply-demand.svg" mode="aspectFit" class="quick-img" />
-        </view>
-        <text class="quick-label">大宗供需</text>
-      </view>
-      <view class="quick-item" @tap="goRanking">
-        <view class="quick-icon-box qib-blue">
-          <image src="/static/images/icon-ranking.svg" mode="aspectFit" class="quick-img" />
-        </view>
-        <text class="quick-label">品种排行</text>
+        <text class="cta-title buy">发布求购</text>
+        <text class="cta-sub">发布需求，找货源</text>
+        <view class="cta-tag tag-orange">采购商入口</view>
       </view>
     </view>
 
-    <!-- Market Ticker -->
-    <view class="ticker-bar" v-if="tickerMsgs.length > 0">
-      <view class="ticker-dot"></view>
-      <swiper class="ticker-swiper" vertical autoplay circular :interval="3000" :duration="500">
-        <swiper-item v-for="(msg, i) in tickerMsgs" :key="i">
-          <text class="ticker-text">{{ msg }}</text>
-        </swiper-item>
-      </swiper>
-    </view>
-
-    <!-- Stats Summary Row -->
-    <view class="stats-row">
-      <view class="stat-item">
-        <text class="stat-num">{{ summary.total || '--' }}</text>
-        <text class="stat-label">在售品种</text>
-      </view>
-      <view class="stat-divider" />
-      <view class="stat-item">
-        <text class="stat-num up">{{ summary.up || 0 }}</text>
-        <text class="stat-label">上涨</text>
-      </view>
-      <view class="stat-divider" />
-      <view class="stat-item">
-        <text class="stat-num down">{{ summary.down || 0 }}</text>
-        <text class="stat-label">下跌</text>
-      </view>
-    </view>
-
-    <!-- Hot Ranking -->
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title-row">
-          <view class="section-dot dot-orange"></view>
-          <text class="section-title">热门品种排行</text>
-        </view>
-        <text class="see-more" @tap="goRanking">更多 ›</text>
-      </view>
-      <view v-if="rankList.length === 0" class="empty-text">暂无数据</view>
-      <view v-for="(item, i) in displayRank" :key="i" class="rank-card">
-        <view class="rank-badge" :class="'rank-' + (i + 1)">{{ i + 1 }}</view>
-        <view class="rank-info">
-          <text class="rank-variety">{{ item.variety }}</text>
-          <text class="rank-market">{{ item.market_name }}</text>
-        </view>
-        <view class="rank-price-col">
-          <text class="rank-price">¥{{ item.price.toFixed(2) }}</text>
-          <view class="rank-change" :class="item.change_pct >= 0 ? 'up' : 'down'">
-            <text>{{ item.change_pct >= 0 ? '▲' : '▼' }}{{ Math.abs(item.change_pct).toFixed(1) }}%</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- Gainers / Losers -->
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title-row">
+    <!-- ===== Zone 3.5: 全链路服务入口 ===== -->
+    <view class="service-entry" @tap="goFinance">
+      <view class="se-left">
+        <view class="se-title-row">
           <view class="section-bar bar-green"></view>
-          <text class="section-title">涨跌榜</text>
+          <text class="se-title">全链路服务</text>
+        </view>
+        <text class="se-desc">采 · 销 · 垫 一站式闭环，助力农产品高效流通</text>
+        <view class="se-tags">
+          <text class="se-tag">产地直采</text>
+          <text class="se-tag">渠道分销</text>
+          <text class="se-tag">商务对接</text>
         </view>
       </view>
-      <view class="gl-row">
-        <view class="gl-col">
-          <text class="gl-title up">▲ 涨幅榜</text>
-          <view v-for="(item, i) in gainers" :key="'g' + i" class="gl-item">
-            <text class="gl-variety">{{ item.variety }}</text>
-            <text class="gl-pct up">+{{ item.change_pct.toFixed(1) }}%</text>
+      <view class="se-arrow"><text>›</text></view>
+    </view>
+
+    <!-- ===== Zone 4: 农产品行情溯源 ===== -->
+    <view class="section-header">
+      <view class="section-bar bar-green"></view>
+      <text class="section-title">行情溯源</text>
+      <text class="section-more" @tap="goRanking">更多 ›</text>
+    </view>
+    <scroll-view scroll-x class="variety-scroll" :show-scrollbar="false">
+      <view class="variety-track">
+        <view v-for="v in varietyCards" :key="v.name" class="variety-card" @tap="goPriceDetail(v)">
+          <view class="vc-top">
+            <text class="vc-emoji">{{ v.emoji }}</text>
+            <view>
+              <text class="vc-name">{{ v.name }}</text>
+              <text class="vc-label">产地报价</text>
+            </view>
           </view>
-          <text v-if="gainers.length === 0" class="empty-text">暂无</text>
-        </view>
-        <view class="gl-divider" />
-        <view class="gl-col">
-          <text class="gl-title down">▼ 跌幅榜</text>
-          <view v-for="(item, i) in losers" :key="'l' + i" class="gl-item">
-            <text class="gl-variety">{{ item.variety }}</text>
-            <text class="gl-pct down">{{ item.change_pct.toFixed(1) }}%</text>
+          <view class="vc-price-row">
+            <text class="vc-price">¥{{ v.price }}</text>
+            <view class="vc-diff" :class="v.up ? 'diff-up' : 'diff-down'">
+              <text>{{ v.up ? '▲' : '▼' }} {{ v.diff }}</text>
+            </view>
           </view>
-          <text v-if="losers.length === 0" class="empty-text">暂无</text>
+          <view class="vc-markets">
+            <view v-for="m in v.markets" :key="m.name" class="vc-market-row">
+              <text class="vcm-name">{{ m.name }}</text>
+              <text class="vcm-price">¥{{ m.price }}</text>
+              <text :class="m.change >= 0 ? 'up' : 'down'">{{ m.change >= 0 ? '▲' : '▼' }}{{ Math.abs(m.change).toFixed(1) }}%</text>
+            </view>
+          </view>
         </view>
       </view>
+    </scroll-view>
+
+    <!-- ===== Zone 6: 平台公告 ===== -->
+    <view class="notice-card" @tap="showNotice">
+      <view class="nc-left">
+        <view class="nc-icon"><text>📢</text></view>
+        <view>
+          <text class="nc-title">{{ latestNotice.title }}</text>
+          <text class="nc-time">{{ latestNotice.time }}</text>
+        </view>
+      </view>
+      <text class="nc-link">查看 ›</text>
     </view>
 
-    <!-- Price Trend Chart -->
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title-row">
-          <view class="section-dot dot-green"></view>
-          <text class="section-title">价格走势</text>
-        </view>
-      </view>
-      <picker :range="varietyList" range-key="label" :value="trendIndex" @change="onVarietyChange" class="trend-picker">
-        <view class="picker-display">
-          <text>{{ varietyList[trendIndex] ? varietyList[trendIndex].label : '选择品种' }}</text>
-          <text class="picker-arrow">›</text>
-        </view>
-      </picker>
-      <view v-if="trendPoints.length > 0" class="chart-area">
-        <view class="chart-y">
-          <text v-for="l in yLabels" :key="l" class="y-label">{{ l }}</text>
-        </view>
-        <view class="chart-canvas-wrapper">
-          <canvas canvas-id="trendCanvas" id="trendCanvas" class="chart-canvas" @touchstart="onChartTouch" />
-        </view>
-        <view class="chart-x">
-          <text v-for="(d, i) in xLabels" :key="i" class="x-label">{{ d }}</text>
-        </view>
-      </view>
-      <view v-else class="empty-text">请选择品种查看走势</view>
-      <view v-if="trendMarkets.length > 0" class="trend-markets">
-        <view v-for="m in trendMarkets" :key="m.market" class="trend-market-item">
-          <text class="tm-name">{{ m.market }}</text>
-          <text class="tm-price">¥{{ m.price.toFixed(2) }}</text>
-          <text :class="m.change >= 0 ? 'up' : 'down'">
-            {{ m.change >= 0 ? '▲' : '▼' }}{{ Math.abs(m.change).toFixed(1) }}%
-          </text>
-        </view>
-      </view>
+    <!-- ===== Zone 8: 页脚 ===== -->
+    <view class="footer">
+      <text>鲜桥 FreshBridge · 让农产品流通更简单</text>
     </view>
 
-    <!-- Market Comparison -->
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title-row">
-          <view class="section-bar bar-gold"></view>
-          <text class="section-title">市场价格对比</text>
-        </view>
-      </view>
-      <view class="market-table">
-        <view class="mt-header">
-          <text class="mt-cell name">市场</text>
-          <text class="mt-cell num">品种数</text>
-          <text class="mt-cell num">均价</text>
-        </view>
-        <view v-for="m in marketCompare" :key="m.market" class="mt-row">
-          <text class="mt-cell name">{{ m.market }}</text>
-          <text class="mt-cell num">{{ m.count }}</text>
-          <text class="mt-cell num bold">¥{{ m.avg.toFixed(2) }}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- Bottom spacer for tab bar -->
-    <view style="height: 120rpx;" />
+    <view style="height: 120rpx;"></view>
   </view>
 </template>
 
@@ -193,379 +133,178 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { get } from '../../utils/api'
 
-const today = ref(new Date().toISOString().slice(0, 10))
+// ===== Zone 1 =====
+const unreadCount = ref(3)
 
-// Banners — img prefers real photo, falls back to emoji placeholder
+// ===== Zone 1.5: Banners =====
 const banners = ref([
   { text: '产地直采', sub: '源头把控 · 一手货源', img: '/static/images/banners/banner-1.jpg' },
   { text: '全国档口', sub: '快速去化 · 品质保证', img: '/static/images/banners/banner-2.jpg' },
   { text: '品质溯源', sub: '从枝头到舌尖的安心', img: '/static/images/banners/banner-3.jpg' },
 ])
 
-// Ticker messages
-const tickerMsgs = ref([
-  '🔥 妃子笑荔枝今日成交量破 2,000 斤',
-  '📦 云南阳光玫瑰新到货，价格微涨 2.3%',
-  '🏆 本周最受欢迎：新疆阿克苏苹果',
-])
+// ===== Zone 2 =====
 
-// Summary
-const summary = ref({ total: 0, up: 0, down: 0 })
-
-// Rankings
+// ===== Zone 4: Market tracking data =====
 const rankList = ref([])
-const displayRank = computed(() => rankList.value.slice(0, 10))
-
-// Gainers / Losers
-const gainers = computed(() => rankList.value.filter(r => r.change_pct > 0).slice(0, 5))
-const losers = computed(() => rankList.value.filter(r => r.change_pct < 0).slice(0, 5))
-
-// Trend
-const varietyList = ref([])
-const trendIndex = ref(0)
-const trendPoints = ref([])
-const trendMarkets = ref([])
-const yLabels = ref([])
-const xLabels = ref([])
-
-// Market comparison
-const marketCompare = ref([])
-
-async function fetchSummary() {
-  try {
-    const res = await get('/market/summary')
-    const s = res.summary || {}
-    summary.value = { total: s.total_varieties || 0, up: s.up_count || 0, down: s.down_count || 0 }
-  } catch (e) { /* silent */ }
-}
-
-async function fetchRankings() {
-  try {
-    const res = await get('/market/prices')
-    const all = res.prices || []
-    rankList.value = all.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    const seen = new Set()
-    varietyList.value = []
-    all.forEach(p => {
-      if (!seen.has(p.variety)) {
-        seen.add(p.variety)
-        varietyList.value.push({ label: p.variety, value: p.variety })
-      }
-    })
-    const markets = {}
-    all.forEach(p => {
-      if (!markets[p.market_name]) markets[p.market_name] = { total: 0, count: 0 }
-      markets[p.market_name].total += p.price
-      markets[p.market_name].count++
-    })
-    marketCompare.value = Object.entries(markets).map(([market, d]) => ({
-      market, count: d.count, avg: d.total / d.count
-    }))
-  } catch (e) { /* silent */ }
-}
-
-async function fetchTrend() {
-  if (varietyList.value.length === 0) return
-  const variety = varietyList.value[trendIndex.value].value
-  try {
-    const res = await get('/market/trend', { variety })
-    trendPoints.value = res.points || []
-    if (trendPoints.value.length > 0) {
-      const prices = trendPoints.value.map(p => p.price)
-      const min = Math.floor(Math.min(...prices) - 1)
-      const max = Math.ceil(Math.max(...prices) + 1)
-      const step = (max - min) / 4
-      yLabels.value = [min + step * 4, min + step * 3, min + step * 2, min + step, min].map(v => parseFloat(v.toFixed(1)))
-      const dates = [...new Set(trendPoints.value.map(p => p.date.slice(5, 10)))]
-      xLabels.value = dates
-      const marketPriceMap = {}
-      trendPoints.value.forEach(p => {
-        if (!marketPriceMap[p.market]) marketPriceMap[p.market] = []
-        marketPriceMap[p.market].push(p)
-      })
-      trendMarkets.value = Object.entries(marketPriceMap).map(([market, pts]) => {
-        const latestPt = pts[pts.length - 1]
-        const prev = pts.length > 1 ? pts[pts.length - 2].price : latestPt.price
-        return { market, price: latestPt.price, change: prev ? ((latestPt.price - prev) / prev * 100) : 0 }
-      })
-      setTimeout(drawChart, 300)
+const varietyCards = computed(() => {
+  if (rankList.value.length === 0) return defaultVarieties
+  const groups = {}
+  rankList.value.forEach(p => {
+    if (!groups[p.variety]) groups[p.variety] = []
+    groups[p.variety].push(p)
+  })
+  return Object.entries(groups).slice(0, 8).map(([name, pts]) => {
+    const latest = pts[0]
+    const prev = pts.length > 1 ? pts[1].price : latest.price
+    const diff = (latest.price - prev).toFixed(2)
+    return {
+      name,
+      emoji: fruitEmoji(name),
+      price: latest.price.toFixed(2),
+      diff: (diff >= 0 ? '+' : '') + diff,
+      up: diff >= 0,
+      markets: pts.slice(0, 3).map(p => ({
+        name: p.market_name, price: p.price.toFixed(2), change: p.change_pct
+      }))
     }
-  } catch (e) { /* silent */ }
-}
-
-function onVarietyChange(e) {
-  trendIndex.value = e.detail.value
-  fetchTrend()
-}
-
-function goMall() { uni.navigateTo({ url: '/pages/mall/index' }) }
-function goFinance() { uni.navigateTo({ url: '/pages/finance/index' }) }
-function goSupplyDemand() { uni.navigateTo({ url: '/pages/supply-demand/index' }) }
-function goRanking() { uni.navigateTo({ url: '/pages/ranking/index' }) }
-
-onShow(() => {
-  fetchSummary()
-  fetchRankings().then(fetchTrend)
+  })
 })
 
-function drawChart() {
-  // #ifdef H5
-  const canvas = document.getElementById('trendCanvas')
-  if (!canvas) return
-  const ctx = canvas.getContext('2d')
-  const w = canvas.offsetWidth || 300
-  const h = canvas.offsetHeight || 160
-  canvas.width = w
-  canvas.height = h
-  const pts = trendPoints.value
-  if (pts.length === 0) return
-  const prices = pts.map(p => p.price)
-  const minP = Math.min(...prices) - 1
-  const maxP = Math.max(...prices) + 1
-  const range = maxP - minP || 1
-  const padL = 10, padR = 10, padT = 10, padB = 20
-  const byDate = {}
-  pts.forEach(p => {
-    const d = p.date.slice(0, 10)
-    if (!byDate[d]) byDate[d] = []
-    byDate[d].push(p)
-  })
-  const dates = Object.keys(byDate)
-  if (dates.length < 2) return
-  ctx.strokeStyle = '#0F3B2C'
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  let first = true
-  dates.forEach((d, i) => {
-    const avg = byDate[d].reduce((s, p) => s + p.price, 0) / byDate[d].length
-    const x = padL + (i / (dates.length - 1)) * (w - padL - padR)
-    const y = padT + ((maxP - avg) / range) * (h - padT - padB)
-    if (first) { ctx.moveTo(x, y); first = false }
-    else ctx.lineTo(x, y)
-  })
-  ctx.stroke()
-  // Draw dots
-  dates.forEach((d, i) => {
-    const avg = byDate[d].reduce((s, p) => s + p.price, 0) / byDate[d].length
-    const x = padL + (i / (dates.length - 1)) * (w - padL - padR)
-    const y = padT + ((maxP - avg) / range) * (h - padT - padB)
-    ctx.fillStyle = '#0F3B2C'
-    ctx.beginPath()
-    ctx.arc(x, y, 3, 0, Math.PI * 2)
-    ctx.fill()
-  })
-  // #endif
+const defaultVarieties = [
+  { name: '黄瓜', emoji: '🥒', price: '2.13', diff: '+2.02', up: true, markets: [{name:'上海辉展',price:'2.13',change:-2.4},{name:'广州江南',price:'2.78',change:-0.4},{name:'北京新发地',price:'1.52',change:1.1}] },
+  { name: '西红柿', emoji: '🍅', price: '2.78', diff: '-0.35', up: false, markets: [{name:'上海辉展',price:'2.78',change:-0.5},{name:'广州江南',price:'3.10',change:0.8},{name:'北京新发地',price:'2.45',change:-1.2}] },
+  { name: '土豆', emoji: '🥔', price: '1.52', diff: '+0.18', up: true, markets: [{name:'上海辉展',price:'1.52',change:1.1},{name:'广州江南',price:'1.80',change:0.3},{name:'北京新发地',price:'1.35',change:-0.5}] },
+  { name: '大米', emoji: '🍚', price: '3.85', diff: '-0.12', up: false, markets: [{name:'上海辉展',price:'3.85',change:-0.3},{name:'广州江南',price:'4.10',change:0.5},{name:'北京新发地',price:'3.60',change:-0.8}] },
+]
+
+function fruitEmoji(name) {
+  const m = { '黄瓜':'🥒','西红柿':'🍅','土豆':'🥔','大米':'🍚','苹果':'🍎','梨':'🍐','橙子':'🍊','葡萄':'🍇','草莓':'🍓','辣椒':'🌶️','茄子':'🍆','豆角':'🫘' }
+  return m[name] || '🍎'
 }
 
-function onChartTouch(e) { /* future: tooltip */ }
+// ===== Zone 6 =====
+const latestNotice = ref({ title: '平台实名认证已上线，请尽快完成认证确保交易安全', time: '2026-06-06' })
+
+// ===== Data fetching =====
+async function fetchPrices() {
+  try { const r = await get('/market/prices'); rankList.value = (r.prices || []).sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) } catch(e){}
+}
+
+// ===== Navigation =====
+function goMessages() { uni.navigateTo({ url: '/pages/message/index' }) }
+function goNewsDetail(n) { uni.showToast({ title: n.text.substring(0, 20), icon: 'none' }) }
+function goPublish(type) { uni.switchTab({ url: '/pages/publish/index' }) }
+function goRanking() { uni.navigateTo({ url: '/pages/ranking/index' }) }
+function goPriceDetail(v) { uni.navigateTo({ url: '/pages/price-compare/index' }) }
+function focusSearch() { uni.navigateTo({ url: '/pages/price-compare/index' }) }
+function goFinance() { uni.navigateTo({ url: '/pages/finance/index' }) }
+function showNotice() { uni.showToast({ title: latestNotice.value.title.substring(0, 20), icon: 'none' }) }
+
+onShow(() => { fetchPrices() })
 </script>
 
 <style scoped lang="scss">
-.page {
-  padding: 24rpx;
-  padding-bottom: 120rpx;
-  background: var(--bg);
-}
+.page { padding: 0 24rpx; background: var(--bg); min-height: 100vh; }
 
-/* ========== Banner ========== */
-.banner-swiper {
-  height: 340rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.1);
-}
-.banner-slide {
-  height: 100%; position: relative;
-}
+/* ===== Z1: Brand Bar ===== */
+.brand-bar { display: flex; justify-content: space-between; align-items: center; padding: 20rpx 0 16rpx; }
+.brand-logo { display: flex; align-items: center; gap: 8rpx; }
+.logo-leaf { width: 48rpx; height: 48rpx; border-radius: 12rpx; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 26rpx; }
+.logo-text { font-size: 36rpx; font-weight: 700; color: var(--primary); letter-spacing: 2rpx; }
+.bell-wrap { position: relative; padding: 8rpx; }
+.bell-icon { font-size: 40rpx; }
+.bell-badge { position: absolute; top: 0; right: 0; min-width: 32rpx; height: 32rpx; line-height: 32rpx; background: var(--danger); color: #fff; font-size: 20rpx; border-radius: 16rpx; text-align: center; padding: 0 6rpx; }
+
+/* Search Bar */
+.home-search { margin-bottom: 16rpx; cursor: pointer; }
+.hs-wrap { display: flex; align-items: center; background: #fff; border-radius: 40rpx; padding: 12rpx 16rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); min-height: 80rpx; }
+.hs-icon { font-size: 28rpx; margin-right: 12rpx; flex-shrink: 0; }
+.hs-input { flex: 1; font-size: 28rpx; color: var(--text); border: none; outline: none; background: transparent; height: 56rpx; line-height: 56rpx; pointer-events: none; }
+.hs-btn { background: var(--primary); color: #fff; padding: 14rpx 32rpx; border-radius: 32rpx; font-size: 26rpx; font-weight: 600; flex-shrink: 0; }
+
+/* ===== Z1.5: Banner ===== */
+.banner-swiper { height: 340rpx; border-radius: 16rpx; overflow: hidden; margin-bottom: 20rpx; box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.1); }
+.banner-slide { height: 100%; position: relative; }
 .banner-img { position: absolute; inset: 0; width: 100%; height: 100%; }
-.banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.05) 100%); z-index: 1; }
+.banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 100%); z-index: 1; }
 .banner-content { position: absolute; left: 32rpx; bottom: 32rpx; z-index: 2; }
 .banner-text { font-size: 40rpx; font-weight: 700; color: #fff; display: block; letter-spacing: 2rpx; text-shadow: 0 2rpx 12rpx rgba(0,0,0,0.3); }
 .banner-sub { font-size: 24rpx; color: rgba(255,255,255,0.85); margin-top: 6rpx; display: block; letter-spacing: 1rpx; }
 
-/* ========== Quick Entry Grid ========== */
-.quick-grid {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
-  padding: 24rpx;
-  background: var(--white);
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
-}
-.quick-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12rpx;
-}
-.quick-icon-box {
-  width: 92rpx;
-  height: 92rpx;
-  border-radius: 22rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 42rpx;
-  transition: transform 0.2s;
-}
-.quick-item:active .quick-icon-box { transform: scale(0.92); }
-.qib-green { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
-.qib-gold { background: linear-gradient(135deg, #FFF8E1, #FFECB3); }
-.qib-orange { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
-.qib-blue { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
-.quick-img { width: 44rpx; height: 44rpx; }
-.quick-label { font-size: 24rpx; color: var(--text-secondary); text-align: center; margin-top: 4rpx; }
+/* ===== Z2: News Ticker ===== */
+.news-scroll { margin-bottom: 20rpx; white-space: nowrap; }
+.news-track { display: inline-flex; gap: 0; background: #F0FDF4; border-radius: 10rpx; padding: 14rpx 8rpx; }
+.news-item { display: inline-flex; align-items: center; gap: 8rpx; padding: 0 16rpx; border-right: 1px solid #D1D5DB; white-space: nowrap; &:last-child { border-right: none; } }
+.news-tag { font-size: 20rpx; font-weight: 700; padding: 3rpx 10rpx; border-radius: 4rpx; color: #fff; }
+.tag-red { background: #DC2626; }
+.tag-orange { background: #D97706; }
+.tag-green { background: #16A34A; }
+.news-text { font-size: 24rpx; color: var(--text-secondary); max-width: 320rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ========== Ticker Bar ========== */
-.ticker-bar {
-  display: flex;
-  align-items: center;
-  background: var(--gold-light);
-  border-radius: 8rpx;
-  padding: 12rpx 16rpx;
-  margin-bottom: 24rpx;
-  height: 56rpx;
-  overflow: hidden;
-}
-.ticker-icon { font-size: 28rpx; margin-right: 12rpx; flex-shrink: 0; }
-.ticker-swiper { flex: 1; height: 56rpx; }
-.ticker-text { font-size: 26rpx; color: var(--text-secondary); line-height: 56rpx; white-space: nowrap; }
+/* ===== Z3: CTA Buttons ===== */
+.cta-row { display: flex; gap: 16rpx; margin-bottom: 32rpx; }
+.cta-card { flex: 1; border-radius: 16rpx; padding: 24rpx; position: relative; overflow: hidden; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.cta-supply { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+.cta-buy { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); }
+.cta-icon-wrap { width: 72rpx; height: 72rpx; border-radius: 18rpx; display: flex; align-items: center; justify-content: center; margin-bottom: 16rpx; }
+.cta-icon-green { background: rgba(15,59,44,0.1); }
+.cta-icon-orange { background: rgba(217,119,6,0.1); }
+.cta-icon { font-size: 38rpx; }
+.cta-title { font-size: 36rpx; font-weight: 700; color: var(--primary); display: block; }
+.cta-title.buy { color: #D97706; }
+.cta-sub { font-size: 24rpx; color: var(--text-secondary); margin-top: 4rpx; display: block; }
+.cta-tag { position: absolute; bottom: 12rpx; right: 12rpx; font-size: 20rpx; padding: 4rpx 12rpx; border-radius: 6rpx; }
+.tag-green { background: rgba(15,59,44,0.1); color: var(--primary); }
+.tag-orange { background: rgba(217,119,6,0.1); color: #D97706; }
 
-/* ========== Stats Row ========== */
-.stats-row {
-  display: flex;
-  background: var(--white);
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
-}
-.stat-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.stat-divider { width: 1px; background: var(--border-light); margin: 0 8rpx; }
-.stat-num { font-size: 40rpx; font-weight: 700; color: var(--text); display: block; }
-.stat-num.up { color: var(--up); }
-.stat-num.down { color: var(--danger); }
-.stat-label { font-size: 24rpx; color: var(--text-muted); margin-top: 4rpx; display: block; }
-
-/* ========== Section ========== */
-.section {
-  background: var(--white);
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
-}
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-.section-title-row { display: flex; align-items: center; gap: 12rpx; }
-/* Section indicators */
-.section-dot { width: 12rpx; height: 12rpx; border-radius: 50%; flex-shrink: 0; }
-.dot-orange { background: #D97706; }
-.dot-green { background: var(--primary); }
-.section-bar { width: 6rpx; height: 22rpx; border-radius: 3rpx; flex-shrink: 0; }
+/* ===== Section Headers ===== */
+.section-header { display: flex; align-items: center; gap: 12rpx; margin-bottom: 16rpx; }
+.section-bar { width: 6rpx; height: 24rpx; border-radius: 3rpx; flex-shrink: 0; }
 .bar-green { background: var(--primary); }
 .bar-gold { background: var(--gold); }
-/* Ticker dot */
-.ticker-bar { display: flex; align-items: center; gap: 12rpx; }
-.ticker-dot { width: 14rpx; height: 14rpx; border-radius: 50%; background: var(--primary); flex-shrink: 0; animation: pulse 2s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-.ticker-icon { display: none; }
-.section-title { font-size: 32rpx; font-weight: 600; color: var(--text); }
-.see-more { font-size: 26rpx; color: var(--primary); }
+.section-title { font-size: 32rpx; font-weight: 700; color: var(--text); }
+.section-more { font-size: 26rpx; color: var(--primary); margin-left: auto; }
 
-/* ---------- Hot Ranking ---------- */
-.rank-card {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1px solid var(--border-light);
-  &:last-child { border-bottom: none; }
-}
-.rank-badge {
-  width: 48rpx;
-  height: 48rpx;
-  line-height: 48rpx;
-  text-align: center;
-  font-size: 28rpx;
-  font-weight: 700;
-  border-radius: 12rpx;
-  margin-right: 16rpx;
-  flex-shrink: 0;
-  background: #F0F0F0;
-  color: var(--text-secondary);
-  &.rank-1 { background: #C9A96E; color: #fff; }
-  &.rank-2 { background: #B0B0B0; color: #fff; }
-  &.rank-3 { background: #CDA87A; color: #fff; }
-}
-.rank-info { flex: 1; }
-.rank-variety { font-size: 30rpx; font-weight: 600; color: var(--text); display: block; }
-.rank-market { font-size: 24rpx; color: var(--text-muted); }
-.rank-price-col { text-align: right; }
-.rank-price { font-size: 30rpx; font-weight: 700; color: var(--text); display: block; }
-.rank-change { font-size: 24rpx; font-weight: 600; }
+/* ===== Z4: Variety Cards ===== */
+.variety-scroll { margin-bottom: 24rpx; white-space: nowrap; }
+.variety-track { display: inline-flex; gap: 16rpx; }
+.variety-card { width: 300rpx; background: #fff; border-radius: 14rpx; padding: 20rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); display: inline-block; white-space: normal; flex-shrink: 0; }
+.vc-top { display: flex; align-items: center; gap: 12rpx; margin-bottom: 16rpx; }
+.vc-emoji { font-size: 44rpx; }
+.vc-name { font-size: 30rpx; font-weight: 700; color: var(--text); display: block; }
+.vc-label { font-size: 22rpx; color: var(--text-muted); }
+.vc-price-row { display: flex; align-items: baseline; gap: 12rpx; margin-bottom: 14rpx; }
+.vc-price { font-size: 36rpx; font-weight: 700; color: var(--primary); }
+.vc-diff { font-size: 24rpx; font-weight: 600; padding: 4rpx 10rpx; border-radius: 6rpx; }
+.diff-up { color: #DC2626; background: #FEE2E2; }
+.diff-down { color: #16A34A; background: #DCFCE7; }
+.vc-markets { border-top: 1px solid var(--border-light); padding-top: 12rpx; }
+.vc-market-row { display: flex; justify-content: space-between; padding: 6rpx 0; font-size: 24rpx; }
+.vcm-name { color: var(--text-secondary); }
+.vcm-price { color: var(--text); font-weight: 600; }
 .up { color: var(--up); }
 .down { color: var(--danger); }
 
-/* ---------- Gainers / Losers ---------- */
-.gl-row { display: flex; }
-.gl-col { flex: 1; }
-.gl-divider { width: 1px; background: var(--border-light); margin: 0 16rpx; }
-.gl-title { font-size: 28rpx; font-weight: 600; margin-bottom: 16rpx; display: block; }
-.gl-item { display: flex; justify-content: space-between; padding: 10rpx 0; }
-.gl-variety { font-size: 28rpx; color: var(--text); }
-.gl-pct { font-size: 28rpx; font-weight: 600; }
+/* ===== Z3.5: 全链路服务入口 ===== */
+.service-entry { display: flex; align-items: center; background: linear-gradient(135deg, #F5ECD7, #FFF8E1); border-radius: 16rpx; padding: 24rpx; margin-bottom: 32rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.se-left { flex: 1; }
+.se-title-row { display: flex; align-items: center; gap: 10rpx; margin-bottom: 8rpx; }
+.se-title { font-size: 32rpx; font-weight: 700; color: var(--text); }
+.se-desc { font-size: 24rpx; color: var(--text-secondary); display: block; margin-bottom: 14rpx; }
+.se-tags { display: flex; gap: 10rpx; }
+.se-tag { font-size: 22rpx; background: rgba(15,59,44,0.08); color: var(--primary); padding: 4rpx 14rpx; border-radius: 6rpx; }
+.se-arrow { width: 56rpx; height: 56rpx; border-radius: 50%; background: rgba(15,59,44,0.08); display: flex; align-items: center; justify-content: center; font-size: 36rpx; color: var(--primary); font-weight: 700; }
 
-/* ---------- Trend Chart ---------- */
-.trend-picker { margin-bottom: 16rpx; }
-.picker-display {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 20rpx;
-  background: #F5F5F5;
-  border-radius: 8rpx;
-  font-size: 30rpx;
-  color: var(--text);
-  min-height: 44px;
-  .picker-arrow { font-size: 28rpx; color: var(--text-muted); font-weight: 600; }
-}
-.chart-area { display: flex; }
-.chart-y { width: 80rpx; display: flex; flex-direction: column-reverse; padding-bottom: 20rpx; }
-.y-label { font-size: 20rpx; color: var(--text-muted); line-height: 2; text-align: right; }
-.chart-canvas-wrapper { flex: 1; }
-.chart-canvas { width: 100%; height: 320rpx; }
-.chart-x { display: flex; justify-content: space-around; padding-left: 80rpx; }
-.x-label { font-size: 22rpx; color: var(--text-muted); }
-.trend-markets { margin-top: 20rpx; padding-top: 20rpx; border-top: 1px solid var(--border-light); }
-.trend-market-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12rpx 0; border-bottom: 1px solid var(--border-light);
-  &:last-child { border-bottom: none; }
-}
-.tm-name { font-size: 28rpx; color: var(--text); }
-.tm-price { font-size: 28rpx; font-weight: 600; color: var(--text); }
+/* ===== Z6: Notice ===== */
+.notice-card { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 14rpx; padding: 24rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); margin-bottom: 32rpx; }
+.nc-left { display: flex; align-items: center; gap: 16rpx; flex: 1; min-width: 0; }
+.nc-icon { width: 56rpx; height: 56rpx; border-radius: 14rpx; background: #F5ECD7; display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
+.nc-title { font-size: 28rpx; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; max-width: 400rpx; }
+.nc-time { font-size: 24rpx; color: var(--text-muted); margin-top: 4rpx; display: block; }
+.nc-link { font-size: 26rpx; color: var(--primary); flex-shrink: 0; }
 
-/* ---------- Market Compare ---------- */
-.market-table { }
-.mt-header, .mt-row { display: flex; padding: 12rpx 0; }
-.mt-header { border-bottom: 2px solid var(--primary); }
-.mt-row { border-bottom: 1px solid var(--border-light); }
-.mt-cell { font-size: 28rpx; color: var(--text); }
-.mt-cell.name { flex: 2; }
-.mt-cell.num { flex: 1; text-align: center; }
-.mt-cell.bold { font-weight: 600; }
-.mt-header .mt-cell { font-weight: 600; color: var(--primary); }
-
-.empty-text { font-size: 28rpx; color: var(--text-muted); text-align: center; padding: 40rpx 0; display: block; }
+/* ===== Z8: Footer ===== */
+.footer { text-align: center; padding: 20rpx 0 40rpx; }
+.footer text { font-size: 22rpx; color: var(--text-muted); }
 </style>

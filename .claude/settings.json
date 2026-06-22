@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(cd /c/Users/Administrator/Desktop/claude/ai自动邀请 && npm run build 2>&1)",
+      "Read(//c/Users/Administrator/Desktop/claude/ai自动邀请/**)"
     ]
   }
 }

@@ -127,6 +127,26 @@
       </view>
       <view class="contact-btn">联系企业微信</view>
     </view>
+
+    <!-- 采购服务 / 农资配套 -->
+    <view class="section-header">
+      <view class="section-bar bar-gold"></view>
+      <text class="section-title">采购服务 / 农资配套</text>
+    </view>
+    <view class="svc-grid">
+      <view class="svc-card" v-for="s in services" :key="s.id" @tap="goServiceDetail(s)">
+        <view class="svc-icon-wrap"><text>{{ s.icon }}</text></view>
+        <text class="svc-name">{{ s.title }}</text>
+        <text class="svc-desc">{{ s.desc }}</text>
+        <view class="svc-list">
+          <view v-for="(item, j) in s.items" :key="j" class="svc-list-row">
+            <text class="svc-dot">•</text>
+            <text>{{ item }}</text>
+          </view>
+        </view>
+        <view class="svc-btn">查看详情 ›</view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -137,6 +157,15 @@ import { get } from '../../utils/api'
 
 const summary = ref({ total_orders: 0, total_amount: 0, today_orders: 0, today_amount: 0 })
 const scrolling = ref([])
+
+const services = ref([
+  { id: 1, icon: '🚛', title: '产地物流', desc: '找车拉货 · 代发代运', items: ['全国冷链物流网络覆盖', '产地直发，降低中转损耗', '实时追踪，全程可视'] },
+  { id: 2, icon: '📦', title: '农资采购', desc: '种子 · 化肥 · 包装材料', items: ['优质农资供应商对接', '集中采购价格更优', '品质保障，送货到田'] },
+  { id: 3, icon: '💰', title: '结算代办', desc: '代收代付 · 资金垫付', items: ['快速结算，T+1到账', '平台担保，交易安全', '灵活账期，缓解资金压力'] },
+  { id: 4, icon: '🏷️', title: '品牌运营', desc: '包装 · 品牌 · 营销推广', items: ['产地品牌策划与包装设计', '线上线下渠道品牌推广', '农产品故事化内容营销'] },
+])
+
+function goServiceDetail(s) { uni.showToast({ title: s.title + '详情开发中', icon: 'none' }) }
 
 function fmtMoney(v) {
   if (!v) return '0'
@@ -246,4 +275,20 @@ onShow(() => { fetchData() })
   background: #fff; color: #15803D; padding: 16rpx 32rpx; border-radius: 32rpx;
   font-size: 28rpx; font-weight: 600; flex-shrink: 0;
 }
+
+/* Service Section */
+.section-header { display: flex; align-items: center; gap: 10rpx; margin-bottom: 20rpx; }
+.section-bar { width: 6rpx; height: 24rpx; border-radius: 3rpx; flex-shrink: 0; }
+.bar-gold { background: var(--gold); }
+.section-title { font-size: 32rpx; font-weight: 700; color: var(--text); }
+
+.svc-grid { display: flex; flex-direction: column; gap: 16rpx; }
+.svc-card { background: #fff; border-radius: 14rpx; padding: 24rpx; box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06); }
+.svc-icon-wrap { width: 72rpx; height: 72rpx; border-radius: 18rpx; background: linear-gradient(135deg, #E8F5E9, #DCEDC8); display: flex; align-items: center; justify-content: center; font-size: 38rpx; margin-bottom: 14rpx; }
+.svc-name { font-size: 30rpx; font-weight: 700; color: var(--text); display: block; }
+.svc-desc { font-size: 24rpx; color: var(--text-muted); margin-top: 4rpx; display: block; }
+.svc-list { margin-top: 16rpx; border-top: 1px solid var(--border-light); padding-top: 14rpx; }
+.svc-list-row { display: flex; align-items: center; gap: 8rpx; padding: 6rpx 0; font-size: 26rpx; color: var(--text-secondary); }
+.svc-dot { color: var(--gold); font-weight: 700; }
+.svc-btn { margin-top: 16rpx; text-align: right; font-size: 26rpx; color: var(--primary); font-weight: 600; }
 </style>

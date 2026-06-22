@@ -117,6 +117,12 @@
       "style": {
         "navigationBarTitleText": "品种排行"
       }
+    },
+    {
+      "path": "pages/price-compare/index",
+      "style": {
+        "navigationBarTitleText": "行情对比"
+      }
     }
   ],
   "globalStyle": {
