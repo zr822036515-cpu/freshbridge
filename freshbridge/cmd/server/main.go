@@ -51,6 +51,7 @@ func main() {
 	mallRepo := repository.NewMallRepo(db)
 	adminRepo := repository.NewAdminRepo(db)
 	gapsRepo := repository.NewGapsRepo(db)
+	squareRepo := repository.NewSquareRepo(db)
 
 	// Init services
 	authSvc := service.NewAuthService(cfg, userRepo)
@@ -67,6 +68,7 @@ func main() {
 	mallH := handler.NewMallHandler(mallRepo)
 	adminH := handler.NewAdminHandler(adminRepo, marketUpdater)
 	gapsH := handler.NewGapsHandler(gapsRepo)
+	squareH := handler.NewSquareHandler(squareRepo, gapsRepo)
 
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -136,6 +138,18 @@ func main() {
 			// Notifications
 			auth.GET("/notifications", gapsH.ListNotifications)
 			auth.PUT("/notifications/:id/read", gapsH.MarkNotificationRead)
+
+			// Square
+			auth.GET("/square/posts", squareH.ListPosts)
+			auth.POST("/square/posts", squareH.CreatePost)
+			auth.GET("/square/posts/search", squareH.SearchPosts)
+			auth.PUT("/square/posts/:id/like", squareH.Like)
+			auth.DELETE("/square/posts/:id/like", squareH.Unlike)
+			auth.POST("/square/posts/:id/comments", squareH.AddComment)
+			auth.GET("/square/posts/:id/comments", squareH.ListComments)
+			auth.POST("/square/follow/:user_id", squareH.Follow)
+			auth.DELETE("/square/follow/:user_id", squareH.Unfollow)
+			auth.GET("/square/posts/:id/phone", squareH.RevealPhone)
 
 			// Mall
 			auth.GET("/mall/cart", mallH.ListCart)

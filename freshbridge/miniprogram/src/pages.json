@@ -123,6 +123,12 @@
       "style": {
         "navigationBarTitleText": "行情对比"
       }
+    },
+    {
+      "path": "pages/square/index",
+      "style": {
+        "navigationBarTitleText": "发布广场"
+      }
     }
   ],
   "globalStyle": {
@@ -146,8 +152,8 @@
         "selectedIconPath": "static/images/home-active.svg"
       },
       {
-        "pagePath": "pages/supply/index",
-        "text": "货源",
+        "pagePath": "pages/square/index",
+        "text": "水果名片",
         "iconPath": "static/images/supply.svg",
         "selectedIconPath": "static/images/supply-active.svg"
       },
