@@ -3,3 +3,4 @@
 node_modules/
 miniprogram/dist/
 internal/static/web/
+freshbridge-server
