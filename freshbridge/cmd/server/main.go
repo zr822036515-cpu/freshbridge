@@ -69,6 +69,7 @@ func main() {
 	adminH := handler.NewAdminHandler(adminRepo, marketUpdater)
 	gapsH := handler.NewGapsHandler(gapsRepo)
 	squareH := handler.NewSquareHandler(squareRepo, gapsRepo)
+	adminV2H := handler.NewAdminV2Handler(adminRepo, squareRepo, gapsRepo)
 
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -104,6 +105,13 @@ func main() {
 	// Public mall (browse products)
 	api.GET("/mall/products", mallH.ListProducts)
 	api.GET("/mall/products/:id", mallH.GetProduct)
+
+	// Public site config
+	api.GET("/site-config", func(c *gin.Context) {
+		configs, err := adminRepo.GetConfigMap()
+		if err != nil { c.JSON(http.StatusOK, gin.H{"configs": map[string]string{}}); return }
+		c.JSON(http.StatusOK, gin.H{"configs": configs})
+	})
 
 	// Protected routes (auth required)
 	auth := api.Group("")
@@ -163,7 +171,10 @@ func main() {
 			auth.PUT("/mall/orders/:id/cancel", mallH.CancelOrder)
 	}
 
-	// Admin API (token auth) — mounted at /admin-api to avoid conflict with /admin static files
+	// Admin login (no auth required)
+	r.POST("/admin-api/login", adminV2H.Login)
+
+	// Admin API (token auth)
 	adminAPI := r.Group("/admin-api")
 	adminAPI.Use(middleware.AdminAuth(cfg.AdminToken))
 	adminAPI.Use(middleware.AdminAudit(gapsRepo))
@@ -179,14 +190,40 @@ func main() {
 		adminAPI.PUT("/products/:id/status", adminH.UpdateProductStatus)
 		adminAPI.GET("/procurements", gapsH.AdminListProcurements)
 		adminAPI.POST("/update-prices", adminH.TriggerPriceUpdate)
-		adminAPI.GET("/audit-logs", gapsH.ListAuditLogs)
+		// Admin v2
+	adminAPI.GET("/dashboard-v2", adminV2H.DashboardV2)
+	adminAPI.GET("/users-v2", adminV2H.ListUsersV2)
+	adminAPI.PUT("/users-v2/:id", adminV2H.UpdateUser)
+	adminAPI.GET("/square-posts", adminV2H.ListSquarePosts)
+	adminAPI.PUT("/square-posts/:id/approve", adminV2H.ApprovePost)
+	adminAPI.PUT("/square-posts/:id/reject", adminV2H.RejectPost)
+	adminAPI.PUT("/square-posts/:id/pin", adminV2H.TogglePinPost)
+	adminAPI.DELETE("/square-posts/:id", adminV2H.DeleteSquarePost)
+	adminAPI.GET("/market-prices", adminV2H.ListMarketPrices)
+	adminAPI.POST("/market-prices", adminV2H.CreateMarketPrice)
+	adminAPI.PUT("/market-prices/:id", adminV2H.UpdateMarketPrice)
+	adminAPI.GET("/banners", adminV2H.ListBanners)
+	adminAPI.POST("/banners", adminV2H.CreateBanner)
+	adminAPI.PUT("/banners/:id", adminV2H.UpdateBanner)
+	adminAPI.DELETE("/banners/:id", adminV2H.DeleteBanner)
+	adminAPI.GET("/announcements", adminV2H.ListAnnouncements)
+	adminAPI.POST("/announcements", adminV2H.CreateAnnouncement)
+	adminAPI.PUT("/announcements/:id", adminV2H.UpdateAnnouncement)
+	adminAPI.DELETE("/announcements/:id", adminV2H.DeleteAnnouncement)
+	// Upload
+	adminAPI.POST("/upload", handler.UploadImage)
+	// Site config
+	adminAPI.GET("/site-config", adminV2H.ListSiteConfig)
+	adminAPI.PUT("/site-config", adminV2H.UpdateSiteConfig)
+	adminAPI.GET("/audit-logs", gapsH.ListAuditLogs)
 	}
 
 	// Start market price updater (runs every 6h)
 	marketUpdater.Start()
 
 	// Admin panel HTML (served at /admin)
-	r.StaticFS("/admin", static.AdminFS())
+	r.GET("/admin", func(c *gin.Context) { c.Redirect(http.StatusMovedPermanently, "/admin/") })
+	r.StaticFS("/admin/", static.AdminFS())
 
 	// SPA frontend (embedded H5 build)
 	r.NoRoute(gin.WrapH(static.Handler()))

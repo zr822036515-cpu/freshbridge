@@ -18,16 +18,23 @@ func Handler() http.Handler {
 	sub, _ := fs.Sub(webDir, "web")
 	fileServer := http.FileServer(http.FS(sub))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := strings.TrimPrefix(r.URL.Path, "/")
+		path := r.URL.Path
+
+		// Don't intercept admin panel
+		if strings.HasPrefix(path, "/admin") {
+			http.NotFound(w, r)
+			return
+		}
 
 		// Serve exact file if it exists
-		if f, err := sub.Open(path); err == nil {
+		trimmed := strings.TrimPrefix(path, "/")
+		if f, err := sub.Open(trimmed); err == nil {
 			f.Close()
 			fileServer.ServeHTTP(w, r)
 			return
 		}
 
-		// SPA fallback: everything else → index.html
+		// SPA fallback
 		r.URL.Path = "/"
 		fileServer.ServeHTTP(w, r)
 	})
